@@ -323,6 +323,39 @@ html, body { height: 100%; width: 100%; background: var(--bg); font-family: 'Nun
         <input class="form-input" id="f-datum" type="date">
       </div>
     </div>
+
+    <div style="background:#EDE7F6;border:1px solid #D1C4E9;border-radius:var(--radius);padding:12px 14px;margin-bottom:12px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <label class="form-label" style="margin:0;color:#5E35B1">📦 Minimale voorraad</label>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:12px;font-weight:700;color:#7B61FF">Actief</span>
+          <div id="f-min-toggle" onclick="toggleMinVoorraad()" style="width:40px;height:22px;border-radius:99px;background:#D1C4E9;cursor:pointer;position:relative;transition:all 0.2s">
+            <div id="f-min-dot" style="width:18px;height:18px;border-radius:50%;background:#fff;position:absolute;top:2px;left:2px;transition:all 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2)"></div>
+          </div>
+        </div>
+      </div>
+      <div id="f-min-velden" style="display:none">
+        <div class="form-row">
+          <div>
+            <label class="form-label">Minimum aantal</label>
+            <input class="form-input" id="f-minimum" type="number" min="0" placeholder="bijv. 2" style="margin-bottom:0">
+          </div>
+          <div>
+            <label class="form-label">Eenheid</label>
+            <select class="form-input" id="f-min-eenheid" style="margin-bottom:0">
+              <option value="stuks">stuks</option>
+              <option value="pak">pak</option>
+              <option value="pot">pot</option>
+              <option value="fles">fles</option>
+              <option value="blik">blik</option>
+              <option value="zak">zak</option>
+            </select>
+          </div>
+        </div>
+        <p style="font-size:11px;color:#7B61FF;font-weight:600;margin-top:6px">Alarm gaat af als de voorraad onder dit aantal komt.</p>
+      </div>
+    </div>
+
     <button class="btn-primary" onclick="slaanOp()">Opslaan</button>
     <button class="btn-danger-outline" id="btn-verwijder" style="display:none" onclick="verwijder()">Verwijder product</button>
     <button class="btn-sec" onclick="sluitOverlay('overlay-toevoegen')">Annuleren</button>
@@ -530,8 +563,17 @@ function isStukProduct(p) {
 }
 
 function getMinimum(p) {
+  // Gebruik product-eigen minimum als dat ingesteld is
+  if(p.minimum !== undefined && p.minimum > 0) return p.minimum;
+  // Anders gebruik standaard uit snellijst
   var s = getSnelItem(p.naam);
   return s ? (s.min || 0) : 0;
+}
+
+function getMinEenheid(p) {
+  if(p.minEenheid) return p.minEenheid;
+  var s = getSnelItem(p.naam);
+  return s ? (s.type || 'stuks') : 'stuks';
 }
 
 function getAantalNum(p) {
@@ -795,6 +837,9 @@ function openToevoegen() {
   document.getElementById('sheet-titel').textContent = 'Product toevoegen';
   ['f-naam','f-icon','f-categorie','f-aantal','f-datum'].forEach(function(id){ document.getElementById(id).value = ''; });
   document.getElementById('btn-verwijder').style.display = 'none';
+  document.getElementById('f-minimum').value = '';
+  document.getElementById('f-min-eenheid').value = 'stuks';
+  setMinToggle(false);
   segWaarden = {locatie:'koelkast',status:'vol'};
   document.querySelectorAll('#seg-locatie .seg-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.val==='koelkast'); });
   document.querySelectorAll('#seg-status .seg-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.val==='vol'); });
@@ -812,6 +857,9 @@ function bewerk(id) {
   document.getElementById('f-categorie').value = p.categorie||'';
   document.getElementById('f-aantal').value = p.aantal||'';
   document.getElementById('f-datum').value = p.datum||'';
+  document.getElementById('f-minimum').value = p.minimum || '';
+  document.getElementById('f-min-eenheid').value = p.minEenheid || 'stuks';
+  setMinToggle(p.minimum > 0);
   document.getElementById('btn-verwijder').style.display = 'block';
   segWaarden = {locatie:p.locatie, status:p.status};
   document.querySelectorAll('#seg-locatie .seg-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.val===p.locatie); });
@@ -849,6 +897,38 @@ function vulSnel(el) {
   }
 }
 
+function toggleMinVoorraad() {
+  var toggle = document.getElementById('f-min-toggle');
+  var dot = document.getElementById('f-min-dot');
+  var velden = document.getElementById('f-min-velden');
+  var actief = velden.style.display !== 'none';
+  if(actief) {
+    velden.style.display = 'none';
+    toggle.style.background = '#D1C4E9';
+    dot.style.left = '2px';
+  } else {
+    velden.style.display = 'block';
+    toggle.style.background = '#7B61FF';
+    dot.style.left = '20px';
+  }
+}
+
+function setMinToggle(actief) {
+  var toggle = document.getElementById('f-min-toggle');
+  var dot = document.getElementById('f-min-dot');
+  var velden = document.getElementById('f-min-velden');
+  if(!toggle || !dot || !velden) return;
+  if(actief) {
+    velden.style.display = 'block';
+    toggle.style.background = '#7B61FF';
+    dot.style.left = '20px';
+  } else {
+    velden.style.display = 'none';
+    toggle.style.background = '#D1C4E9';
+    dot.style.left = '2px';
+  }
+}
+
 function segKies(type, el) {
   document.querySelectorAll('#seg-' + type + ' .seg-btn').forEach(function(b){ b.classList.remove('active'); });
   el.classList.add('active');
@@ -858,6 +938,11 @@ function segKies(type, el) {
 function slaanOp() {
   var naam = document.getElementById('f-naam').value.trim();
   if(!naam) { alert('Vul een naam in'); return; }
+  var minVelden = document.getElementById('f-min-velden');
+  var minActief = minVelden && minVelden.style.display !== 'none';
+  var minimumVal = minActief ? parseInt(document.getElementById('f-minimum').value) || 0 : 0;
+  var minEenheidVal = minActief ? document.getElementById('f-min-eenheid').value : 'stuks';
+
   var prod = {
     id: bewerkId || ('p' + Date.now()),
     naam: naam,
@@ -867,9 +952,21 @@ function slaanOp() {
     status: segWaarden.status,
     aantal: document.getElementById('f-aantal').value.trim(),
     datum: document.getElementById('f-datum').value,
+    minimum: minimumVal,
+    minEenheid: minEenheidVal,
   };
   if(bewerkId) { var i = producten.findIndex(function(p){return p.id===bewerkId;}); producten[i] = prod; }
   else producten.push(prod);
+
+  // Automatisch toevoegen aan boodschappenlijst als status op of bijna op is
+  if(prod.status === 'op' || prod.status === 'bijna') {
+    if(boodschappenGekocht.indexOf(prod.id) !== -1) {
+      // Was afgevinkt als gekocht - verwijder uit gekocht lijst zodat het weer zichtbaar is
+      boodschappenGekocht = boodschappenGekocht.filter(function(id){ return id !== prod.id; });
+      slaBoodschappen();
+    }
+  }
+
   slaMetSync(); render(); sluitOverlay('overlay-toevoegen');
 }
 
