@@ -389,41 +389,105 @@ var SNELLIJST = [
 ];
 
 var RECEPTEN = [
-  // SLOWCOOKER AARDAPPEL
-  {naam:'Stoofvlees met aardappels en prei', type:'slowcooker', ing:['Stoofvlees','Aardappels','Wortel','Prei','Uien']},
-  {naam:'Kippendijen met aardappels en courgette', type:'slowcooker', ing:['Kippendijen','Aardappels','Courgette','Wortel','Uien']},
-  {naam:'Gehaktballen met aardappels en sperziebonen', type:'slowcooker', ing:['Gehakt','Aardappels','Sperziebonen','Uien']},
-  {naam:'Varkensschouder met aardappels en snijbonen', type:'slowcooker', ing:['Varkensschouder','Aardappels','Snijbonen','Broccoli','Uien']},
-  {naam:'Kippendijen met aardappels en bloemkool', type:'slowcooker', ing:['Kippendijen','Aardappels','Bloemkool','Uien']},
-  {naam:'Gehakt met aardappels en wortel', type:'slowcooker', ing:['Gehakt','Aardappels','Wortel','Uien']},
-  {naam:'Stoofvlees met aardappels en snijbonen', type:'slowcooker', ing:['Stoofvlees','Aardappels','Snijbonen','Uien']},
-  {naam:'Varkensschouder met aardappels en prei', type:'slowcooker', ing:['Varkensschouder','Aardappels','Prei','Wortel','Uien']},
-  {naam:'Kippendijen met aardappels en broccoli', type:'slowcooker', ing:['Kippendijen','Aardappels','Broccoli','Uien']},
-  {naam:'Stoofvlees met aardappels en bloemkool', type:'slowcooker', ing:['Stoofvlees','Aardappels','Bloemkool','Wortel','Uien']},
-  {naam:'Gehaktballen met aardappels en doperwten', type:'slowcooker', ing:['Gehakt','Aardappels','Doperwten','Uien']},
-  {naam:'Varkensschouder met aardappels en courgette', type:'slowcooker', ing:['Varkensschouder','Aardappels','Courgette','Uien']},
+  // SLOWCOOKER AARDAPPEL (1 persoon tenzij anders aangegeven)
+  {naam:'Stoofvlees met aardappels en prei', type:'slowcooker', ing:[
+    {naam:'Stoofvlees', hoeveelheid:'200g'}, {naam:'Aardappels', hoeveelheid:'2 stuks'}, {naam:'Wortel', hoeveelheid:'2 stuks'}, {naam:'Prei', hoeveelheid:'1 stuk'}, {naam:'Uien', hoeveelheid:'1 stuk'}, {naam:'Runderbouillon', hoeveelheid:'150ml'}
+  ]},
+  {naam:'Kippendijen met aardappels en courgette', type:'slowcooker', ing:[
+    {naam:'Kippendijen', hoeveelheid:'2 stuks'}, {naam:'Aardappels', hoeveelheid:'2 stuks'}, {naam:'Courgette', hoeveelheid:'0.5 stuk'}, {naam:'Wortel', hoeveelheid:'1 stuk'}, {naam:'Uien', hoeveelheid:'1 stuk'}, {naam:'Kippenbouillon', hoeveelheid:'150ml'}
+  ]},
+  {naam:'Gehaktballen met aardappels en sperziebonen', type:'slowcooker', ing:[
+    {naam:'Gehakt', hoeveelheid:'200g'}, {naam:'Aardappels', hoeveelheid:'2 stuks'}, {naam:'Sperziebonen', hoeveelheid:'150g'}, {naam:'Uien', hoeveelheid:'1 stuk'}, {naam:'Runderbouillon', hoeveelheid:'150ml'}
+  ]},
+  {naam:'Varkensschouder met aardappels en snijbonen', type:'slowcooker', ing:[
+    {naam:'Varkensschouder', hoeveelheid:'200g'}, {naam:'Aardappels', hoeveelheid:'2 stuks'}, {naam:'Snijbonen', hoeveelheid:'150g'}, {naam:'Broccoli', hoeveelheid:'150g'}, {naam:'Uien', hoeveelheid:'1 stuk'}, {naam:'Runderbouillon', hoeveelheid:'150ml'}
+  ]},
+  {naam:'Kippendijen met aardappels en bloemkool', type:'slowcooker', ing:[
+    {naam:'Kippendijen', hoeveelheid:'2 stuks'}, {naam:'Aardappels', hoeveelheid:'2 stuks'}, {naam:'Bloemkool', hoeveelheid:'200g'}, {naam:'Uien', hoeveelheid:'1 stuk'}, {naam:'Kippenbouillon', hoeveelheid:'150ml'}
+  ]},
+  {naam:'Gehakt met aardappels en wortel', type:'slowcooker', ing:[
+    {naam:'Gehakt', hoeveelheid:'200g'}, {naam:'Aardappels', hoeveelheid:'2 stuks'}, {naam:'Wortel', hoeveelheid:'2 stuks'}, {naam:'Uien', hoeveelheid:'1 stuk'}, {naam:'Runderbouillon', hoeveelheid:'150ml'}
+  ]},
+  {naam:'Stoofvlees met aardappels en snijbonen', type:'slowcooker', ing:[
+    {naam:'Stoofvlees', hoeveelheid:'200g'}, {naam:'Aardappels', hoeveelheid:'2 stuks'}, {naam:'Snijbonen', hoeveelheid:'150g'}, {naam:'Uien', hoeveelheid:'1 stuk'}, {naam:'Runderbouillon', hoeveelheid:'150ml'}
+  ]},
+  {naam:'Varkensschouder met aardappels en prei', type:'slowcooker', ing:[
+    {naam:'Varkensschouder', hoeveelheid:'200g'}, {naam:'Aardappels', hoeveelheid:'2 stuks'}, {naam:'Prei', hoeveelheid:'1 stuk'}, {naam:'Wortel', hoeveelheid:'1 stuk'}, {naam:'Uien', hoeveelheid:'1 stuk'}, {naam:'Runderbouillon', hoeveelheid:'150ml'}
+  ]},
+  {naam:'Kippendijen met aardappels en broccoli', type:'slowcooker', ing:[
+    {naam:'Kippendijen', hoeveelheid:'2 stuks'}, {naam:'Aardappels', hoeveelheid:'2 stuks'}, {naam:'Broccoli', hoeveelheid:'200g'}, {naam:'Uien', hoeveelheid:'1 stuk'}, {naam:'Kippenbouillon', hoeveelheid:'150ml'}
+  ]},
+  {naam:'Stoofvlees met aardappels en bloemkool', type:'slowcooker', ing:[
+    {naam:'Stoofvlees', hoeveelheid:'200g'}, {naam:'Aardappels', hoeveelheid:'2 stuks'}, {naam:'Bloemkool', hoeveelheid:'200g'}, {naam:'Wortel', hoeveelheid:'1 stuk'}, {naam:'Uien', hoeveelheid:'1 stuk'}, {naam:'Runderbouillon', hoeveelheid:'150ml'}
+  ]},
+  {naam:'Gehaktballen met aardappels en doperwten', type:'slowcooker', ing:[
+    {naam:'Gehakt', hoeveelheid:'200g'}, {naam:'Aardappels', hoeveelheid:'2 stuks'}, {naam:'Doperwten', hoeveelheid:'150g'}, {naam:'Uien', hoeveelheid:'1 stuk'}, {naam:'Runderbouillon', hoeveelheid:'150ml'}
+  ]},
+  {naam:'Varkensschouder met aardappels en courgette', type:'slowcooker', ing:[
+    {naam:'Varkensschouder', hoeveelheid:'200g'}, {naam:'Aardappels', hoeveelheid:'2 stuks'}, {naam:'Courgette', hoeveelheid:'0.5 stuk'}, {naam:'Uien', hoeveelheid:'1 stuk'}, {naam:'Runderbouillon', hoeveelheid:'150ml'}
+  ]},
   // SLOWCOOKER RIJST
-  {naam:'Kip teriyaki met rijst en doperwten', type:'slowcooker', ing:['Kippendijen','Rijst','Doperwten','Uien']},
-  {naam:'Gehaktballen met rijst en prei', type:'slowcooker', ing:['Gehakt','Rijst','Prei','Uien']},
-  {naam:'Varkensvlees met rijst en broccoli', type:'slowcooker', ing:['Varkensschouder','Rijst','Broccoli','Uien']},
-  {naam:'Stoofvlees met rijst en snijbonen', type:'slowcooker', ing:['Stoofvlees','Rijst','Snijbonen','Wortel','Uien']},
-  {naam:'Kippendijen met rijst en bloemkool', type:'slowcooker', ing:['Kippendijen','Rijst','Bloemkool','Uien']},
-  {naam:'Gehakt met rijst en courgette', type:'slowcooker', ing:['Gehakt','Rijst','Courgette','Uien']},
-  {naam:'Varkensschouder met rijst en sperziebonen', type:'slowcooker', ing:['Varkensschouder','Rijst','Sperziebonen','Uien']},
-  {naam:'Stoofvlees met rijst en doperwten', type:'slowcooker', ing:['Stoofvlees','Rijst','Doperwten','Wortel','Uien']},
-  {naam:'Kippendijen met rijst en snijbonen', type:'slowcooker', ing:['Kippendijen','Rijst','Snijbonen','Uien']},
-  {naam:'Gehaktballen met rijst en wortel', type:'slowcooker', ing:['Gehakt','Rijst','Wortel','Uien']},
+  {naam:'Kip teriyaki met rijst en doperwten', type:'slowcooker', ing:[
+    {naam:'Kippendijen', hoeveelheid:'2 stuks'}, {naam:'Rijst', hoeveelheid:'150g'}, {naam:'Doperwten', hoeveelheid:'150g'}, {naam:'Uien', hoeveelheid:'1 stuk'}, {naam:'Kippenbouillon', hoeveelheid:'100ml'}, {naam:'Sojasaus', hoeveelheid:'2 eetl.'}, {naam:'Honing', hoeveelheid:'1 eetl.'}
+  ]},
+  {naam:'Gehaktballen met rijst en prei', type:'slowcooker', ing:[
+    {naam:'Gehakt', hoeveelheid:'200g'}, {naam:'Rijst', hoeveelheid:'150g'}, {naam:'Prei', hoeveelheid:'150g'}, {naam:'Uien', hoeveelheid:'1 stuk'}, {naam:'Runderbouillon', hoeveelheid:'100ml'}
+  ]},
+  {naam:'Varkensvlees met rijst en broccoli', type:'slowcooker', ing:[
+    {naam:'Varkensschouder', hoeveelheid:'200g'}, {naam:'Rijst', hoeveelheid:'150g'}, {naam:'Broccoli', hoeveelheid:'150g'}, {naam:'Uien', hoeveelheid:'1 stuk'}, {naam:'Runderbouillon', hoeveelheid:'100ml'}, {naam:'Sojasaus', hoeveelheid:'2 eetl.'}
+  ]},
+  {naam:'Stoofvlees met rijst en snijbonen', type:'slowcooker', ing:[
+    {naam:'Stoofvlees', hoeveelheid:'200g'}, {naam:'Rijst', hoeveelheid:'150g'}, {naam:'Snijbonen', hoeveelheid:'150g'}, {naam:'Wortel', hoeveelheid:'1 stuk'}, {naam:'Uien', hoeveelheid:'1 stuk'}, {naam:'Runderbouillon', hoeveelheid:'100ml'}
+  ]},
+  {naam:'Kippendijen met rijst en bloemkool', type:'slowcooker', ing:[
+    {naam:'Kippendijen', hoeveelheid:'2 stuks'}, {naam:'Rijst', hoeveelheid:'150g'}, {naam:'Bloemkool', hoeveelheid:'150g'}, {naam:'Uien', hoeveelheid:'1 stuk'}, {naam:'Kippenbouillon', hoeveelheid:'100ml'}
+  ]},
+  {naam:'Gehakt met rijst en courgette', type:'slowcooker', ing:[
+    {naam:'Gehakt', hoeveelheid:'200g'}, {naam:'Rijst', hoeveelheid:'150g'}, {naam:'Courgette', hoeveelheid:'0.5 stuk'}, {naam:'Uien', hoeveelheid:'1 stuk'}, {naam:'Runderbouillon', hoeveelheid:'100ml'}
+  ]},
+  {naam:'Varkensschouder met rijst en sperziebonen', type:'slowcooker', ing:[
+    {naam:'Varkensschouder', hoeveelheid:'200g'}, {naam:'Rijst', hoeveelheid:'150g'}, {naam:'Sperziebonen', hoeveelheid:'150g'}, {naam:'Uien', hoeveelheid:'1 stuk'}, {naam:'Runderbouillon', hoeveelheid:'100ml'}
+  ]},
+  {naam:'Stoofvlees met rijst en doperwten', type:'slowcooker', ing:[
+    {naam:'Stoofvlees', hoeveelheid:'200g'}, {naam:'Rijst', hoeveelheid:'150g'}, {naam:'Doperwten', hoeveelheid:'150g'}, {naam:'Wortel', hoeveelheid:'1 stuk'}, {naam:'Uien', hoeveelheid:'1 stuk'}, {naam:'Runderbouillon', hoeveelheid:'100ml'}
+  ]},
+  {naam:'Kippendijen met rijst en snijbonen', type:'slowcooker', ing:[
+    {naam:'Kippendijen', hoeveelheid:'2 stuks'}, {naam:'Rijst', hoeveelheid:'150g'}, {naam:'Snijbonen', hoeveelheid:'150g'}, {naam:'Uien', hoeveelheid:'1 stuk'}, {naam:'Kippenbouillon', hoeveelheid:'100ml'}
+  ]},
+  {naam:'Gehaktballen met rijst en wortel', type:'slowcooker', ing:[
+    {naam:'Gehakt', hoeveelheid:'200g'}, {naam:'Rijst', hoeveelheid:'150g'}, {naam:'Wortel', hoeveelheid:'2 stuks'}, {naam:'Uien', hoeveelheid:'1 stuk'}, {naam:'Runderbouillon', hoeveelheid:'100ml'}
+  ]},
   // PASTA (voor 5 personen)
-  {naam:'Spaghetti bolognese', type:'pasta', ing:['Gehakt','Spaghetti','Uien','Tomatenblokjes']},
-  {naam:'Pasta met kip en wortel', type:'pasta', ing:['Kippendijen','Penne','Wortel','Uien']},
-  {naam:'Pasta met rul gehakt en doperwten', type:'pasta', ing:['Gehakt','Penne','Doperwten','Uien']},
-  {naam:'Pasta met kip en prei', type:'pasta', ing:['Kippendijen','Penne','Prei','Uien']},
-  {naam:'Spaghetti met gehaktballen', type:'pasta', ing:['Gehakt','Spaghetti','Uien','Tomatenblokjes']},
-  {naam:'Pasta met varkensvlees en courgette', type:'pasta', ing:['Varkensschouder','Penne','Courgette','Uien']},
-  {naam:'Farfalle met kip en broccoli', type:'pasta', ing:['Kippendijen','Farfalle','Broccoli','Uien']},
-  {naam:'Pasta met gehakt en snijbonen', type:'pasta', ing:['Gehakt','Penne','Snijbonen','Uien']},
-  {naam:'Farfalle met kippendijen en wortel', type:'pasta', ing:['Kippendijen','Farfalle','Wortel','Prei','Uien']},
-  {naam:'Spaghetti met varkensvlees', type:'pasta', ing:['Varkensschouder','Spaghetti','Uien','Tomatenblokjes']},
+  {naam:'Spaghetti bolognese', type:'pasta', ing:[
+    {naam:'Gehakt', hoeveelheid:'600g'}, {naam:'Spaghetti', hoeveelheid:'500g'}, {naam:'Uien', hoeveelheid:'2 stuks'}, {naam:'Tomatenblokjes', hoeveelheid:'2 blikken'}, {naam:'Knoflookpoeder', hoeveelheid:'2 tl'}, {naam:'Italiaanse kruiden', hoeveelheid:'2 tl'}
+  ]},
+  {naam:'Pasta met kip en wortel', type:'pasta', ing:[
+    {naam:'Kippendijen', hoeveelheid:'600g'}, {naam:'Penne', hoeveelheid:'500g'}, {naam:'Wortel', hoeveelheid:'3 stuks'}, {naam:'Uien', hoeveelheid:'2 stuks'}, {naam:'Kippenbouillon', hoeveelheid:'200ml'}
+  ]},
+  {naam:'Pasta met rul gehakt en doperwten', type:'pasta', ing:[
+    {naam:'Gehakt', hoeveelheid:'600g'}, {naam:'Penne', hoeveelheid:'500g'}, {naam:'Doperwten', hoeveelheid:'300g'}, {naam:'Uien', hoeveelheid:'2 stuks'}, {naam:'Runderbouillon', hoeveelheid:'150ml'}
+  ]},
+  {naam:'Pasta met kip en prei', type:'pasta', ing:[
+    {naam:'Kippendijen', hoeveelheid:'600g'}, {naam:'Penne', hoeveelheid:'500g'}, {naam:'Prei', hoeveelheid:'2 stuks'}, {naam:'Uien', hoeveelheid:'2 stuks'}, {naam:'Kippenbouillon', hoeveelheid:'200ml'}
+  ]},
+  {naam:'Spaghetti met gehaktballen', type:'pasta', ing:[
+    {naam:'Gehakt', hoeveelheid:'600g'}, {naam:'Spaghetti', hoeveelheid:'500g'}, {naam:'Uien', hoeveelheid:'2 stuks'}, {naam:'Tomatenblokjes', hoeveelheid:'2 blikken'}
+  ]},
+  {naam:'Pasta met varkensvlees en courgette', type:'pasta', ing:[
+    {naam:'Varkensschouder', hoeveelheid:'600g'}, {naam:'Penne', hoeveelheid:'500g'}, {naam:'Courgette', hoeveelheid:'2 stuks'}, {naam:'Uien', hoeveelheid:'2 stuks'}, {naam:'Runderbouillon', hoeveelheid:'200ml'}
+  ]},
+  {naam:'Farfalle met kip en broccoli', type:'pasta', ing:[
+    {naam:'Kippendijen', hoeveelheid:'600g'}, {naam:'Farfalle', hoeveelheid:'500g'}, {naam:'Broccoli', hoeveelheid:'400g'}, {naam:'Uien', hoeveelheid:'2 stuks'}, {naam:'Kippenbouillon', hoeveelheid:'200ml'}
+  ]},
+  {naam:'Pasta met gehakt en snijbonen', type:'pasta', ing:[
+    {naam:'Gehakt', hoeveelheid:'600g'}, {naam:'Penne', hoeveelheid:'500g'}, {naam:'Snijbonen', hoeveelheid:'300g'}, {naam:'Uien', hoeveelheid:'2 stuks'}, {naam:'Runderbouillon', hoeveelheid:'150ml'}
+  ]},
+  {naam:'Farfalle met kippendijen en wortel', type:'pasta', ing:[
+    {naam:'Kippendijen', hoeveelheid:'600g'}, {naam:'Farfalle', hoeveelheid:'500g'}, {naam:'Wortel', hoeveelheid:'3 stuks'}, {naam:'Prei', hoeveelheid:'1 stuk'}, {naam:'Uien', hoeveelheid:'2 stuks'}, {naam:'Kippenbouillon', hoeveelheid:'200ml'}
+  ]},
+  {naam:'Spaghetti met varkensvlees', type:'pasta', ing:[
+    {naam:'Varkensschouder', hoeveelheid:'600g'}, {naam:'Spaghetti', hoeveelheid:'500g'}, {naam:'Uien', hoeveelheid:'2 stuks'}, {naam:'Tomatenblokjes', hoeveelheid:'2 blikken'}, {naam:'Knoflookpoeder', hoeveelheid:'2 tl'}
+  ]},
 ];
 
 var producten = JSON.parse(localStorage.getItem('voorraad') || '[]');
@@ -730,45 +794,224 @@ function verwijder() {
 }
 
 // ============ RECEPTEN ============
+function getNaam(ing) {
+  return typeof ing === 'string' ? ing : ing.naam;
+}
+function getHoeveelheid(ing) {
+  return (typeof ing === 'object' && ing.hoeveelheid) ? ing.hoeveelheid : '';
+}
+function ingInVoorraad(ing) {
+  var naam = getNaam(ing);
+  return producten.some(function(p) {
+    return p.naam.toLowerCase().indexOf(naam.toLowerCase()) !== -1 && p.status !== 'op';
+  });
+}
+
+var receptFilter = 'alles';
+
 function openRecept() {
-  document.getElementById('recept-list').innerHTML = RECEPTEN.map(function(r){
-    var ontbreekt = r.ing.filter(function(ing){
-      return !producten.some(function(p){ return p.naam.toLowerCase().indexOf(ing.toLowerCase()) !== -1 && p.status !== 'op'; });
-    });
-    var status = ontbreekt.length
-      ? '<div class="recept-warn">⚠️ Niet aanwezig: ' + ontbreekt.join(', ') + '</div>'
-      : '<div class="recept-ok">✓ Alles aanwezig</div>';
-    return '<div class="recept-item" onclick="gebruikRecept(\'' + r.naam.replace(/'/g,"\\'") + '\')">' +
-      '<div class="recept-naam">' + r.naam + '</div>' +
-      '<div class="recept-ing">' + r.ing.join(' · ') + '</div>' + status + '</div>';
-  }).join('');
+  var el = document.getElementById('recept-list');
+  el.innerHTML = '';
+
+  // Filter knoppen
+  var filterDiv = document.createElement('div');
+  filterDiv.style.cssText = 'display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px';
+  [{v:'alles',l:'Alles'},{v:'slowcooker',l:'🥘 Slowcooker'},{v:'pasta',l:'🍝 Pasta'}].forEach(function(f) {
+    var btn = document.createElement('button');
+    btn.textContent = f.l;
+    btn.style.cssText = 'padding:6px 12px;border-radius:99px;border:1px solid;font-family:Nunito,sans-serif;font-size:12px;font-weight:800;cursor:pointer';
+    if(receptFilter === f.v) {
+      btn.style.background = 'var(--text)'; btn.style.color = '#fff'; btn.style.borderColor = 'var(--text)';
+    } else {
+      btn.style.background = 'var(--card2)'; btn.style.color = 'var(--muted)'; btn.style.borderColor = 'var(--border)';
+    }
+    btn.onclick = function() { receptFilter = f.v; openRecept(); };
+    filterDiv.appendChild(btn);
+  });
+  el.appendChild(filterDiv);
+
+  // Recepten
+  var gefilterd = RECEPTEN.filter(function(r) {
+    return receptFilter === 'alles' || r.type === receptFilter;
+  });
+
+  gefilterd.forEach(function(r) {
+    var receptIdx = RECEPTEN.indexOf(r);
+
+    // Check ontbrekende
+    var ontbreekt = r.ing.filter(function(ing) { return !ingInVoorraad(ing); });
+
+    // Card opbouwen met DOM
+    var card = document.createElement('div');
+    card.className = 'recept-item';
+    card.style.marginBottom = '7px';
+
+    // Naam + type badge
+    var naamDiv = document.createElement('div');
+    naamDiv.className = 'recept-naam';
+    naamDiv.textContent = r.naam;
+    var badge = document.createElement('span');
+    badge.style.cssText = 'font-size:10px;border-radius:99px;padding:2px 8px;font-weight:800;margin-left:6px';
+    if(r.type === 'pasta') {
+      badge.textContent = 'Pasta'; badge.style.background = '#FFF8E1'; badge.style.color = '#FF8F00';
+    } else {
+      badge.textContent = 'Slowcooker'; badge.style.background = '#E3F2FD'; badge.style.color = '#2979FF';
+    }
+    naamDiv.appendChild(badge);
+
+    // Ingredienten
+    var ingDiv = document.createElement('div');
+    ingDiv.className = 'recept-ing';
+    ingDiv.textContent = r.ing.map(function(ing) {
+      var h = getHoeveelheid(ing);
+      return getNaam(ing) + (h ? ' ' + h : '');
+    }).join(' · ');
+
+    // Status
+    var statusDiv = document.createElement('div');
+    if(ontbreekt.length > 0) {
+      statusDiv.className = 'recept-warn';
+      statusDiv.textContent = '⚠️ Ontbreekt: ' + ontbreekt.map(function(ing) {
+        var h = getHoeveelheid(ing);
+        return getNaam(ing) + (h ? ' (' + h + ')' : '');
+      }).join(', ');
+    } else {
+      statusDiv.className = 'recept-ok';
+      statusDiv.textContent = '✓ Alles aanwezig';
+    }
+
+    card.appendChild(naamDiv);
+    card.appendChild(ingDiv);
+    card.appendChild(statusDiv);
+    card.dataset.idx = receptIdx;
+    card.addEventListener('click', function() { verwerkRecept(parseInt(this.dataset.idx)); });
+    el.appendChild(card);
+  });
+
   document.getElementById('overlay-recept').classList.add('open');
 }
 
-function gebruikReceptIdx(idx) {
-  gebruikRecept(RECEPTEN[idx]);
-}
+function verwerkRecept(idx) {
+  var r = RECEPTEN[idx];
+  if(!r) return;
 
-function gebruikRecept(r) {
-  if(typeof r === 'string') {
-    r = RECEPTEN.find(function(x){ return x.naam === r; });
-  }
-  if(!r) return;
-  var r = RECEPTEN.find(function(x){ return x.naam===naam; });
-  if(!r) return;
-  var verbruikt = [];
+  // Stap 1: ontbrekende ingredienten
+  var ontbreekt = r.ing.filter(function(ing) { return !ingInVoorraad(ing); });
+
+  // Stap 2: voeg ontbrekende toe aan boodschappenlijst
+  var toegevoegd = [];
+  ontbreekt.forEach(function(ing) {
+    var naam = getNaam(ing);
+    var hoeveelheid = getHoeveelheid(ing);
+    var bestaatAl = producten.some(function(p) { return p.naam.toLowerCase() === naam.toLowerCase(); });
+    if(!bestaatAl) {
+      var snelItem = SNELLIJST.find(function(s) { return s.naam.toLowerCase().indexOf(naam.toLowerCase()) !== -1; });
+      producten.push({
+        id: 'p' + Date.now() + Math.floor(Math.random() * 10000),
+        naam: naam,
+        icon: snelItem ? snelItem.icon : '📦',
+        locatie: snelItem ? snelItem.loc : 'koelkast',
+        categorie: snelItem ? snelItem.cat : 'Overig',
+        status: 'op',
+        aantal: hoeveelheid,
+        datum: ''
+      });
+    } else {
+      producten.forEach(function(p) {
+        if(p.naam.toLowerCase() === naam.toLowerCase()) {
+          p.status = 'op';
+          if(hoeveelheid) p.aantal = hoeveelheid;
+        }
+      });
+    }
+    toegevoegd.push(naam + (hoeveelheid ? ' (' + hoeveelheid + ')' : ''));
+  });
+
+  // Stap 3: verlaag voorraad van aanwezige ingredienten
   r.ing.forEach(function(ing) {
+    var naam = getNaam(ing);
+    var wasOntbrekend = ontbreekt.some(function(o) { return getNaam(o) === naam; });
+    if(wasOntbrekend) return;
     producten.forEach(function(p) {
-      if(p.naam.toLowerCase().indexOf(ing.toLowerCase()) !== -1) {
-        if(p.status==='vol') { p.status='half'; verbruikt.push(p.naam); }
-        else if(p.status==='half') { p.status='bijna'; verbruikt.push(p.naam); }
-        else if(p.status==='bijna') { p.status='op'; verbruikt.push(p.naam); }
+      if(p.naam.toLowerCase().indexOf(naam.toLowerCase()) !== -1) {
+        if(p.status === 'vol') p.status = 'half';
+        else if(p.status === 'half') p.status = 'bijna';
+        else if(p.status === 'bijna') p.status = 'op';
       }
     });
   });
-  slaMetSync(); render(); sluitOverlay('overlay-recept');
-  alert('Recept verwerkt! Aangepast: ' + verbruikt.join(', '));
+
+  slaMetSync();
+  render();
+  sluitOverlay('overlay-recept');
+
+  // Stap 4: melding + agenda
+  var msg = '';
+  if(toegevoegd.length > 0) msg += '🛒 Toegevoegd aan boodschappenlijst:\n' + toegevoegd.join('\n') + '\n\n';
+  msg += '📅 Op welke dag wil je "' + r.naam + '" eten?\n(bijv. maandag, morgen, 15 april - of leeg laten om over te slaan)';
+  var dag = prompt(msg);
+  if(dag && dag.trim()) maakAgendaItem(r.naam, dag.trim(), r.type);
 }
+
+function maakAgendaItem(receptNaam, dagTekst, type) {
+  var datum = parseDag(dagTekst);
+  var morgen = new Date(datum.getTime() + 86400000);
+  var beschrijving = type === 'pasta'
+    ? 'Pasta koken als je thuiskomt om 17:30. Saus staat klaar in de slowcooker.'
+    : 'Slowcooker instellen om 07:45 op LOW 9.5 uur. Klaar om 17:15.';
+  var ics = [
+    'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Voorraad App//NL',
+    'BEGIN:VEVENT',
+    'UID:' + Date.now() + '@voorraad',
+    'DTSTAMP:' + formatIcsDate(new Date()),
+    'DTSTART;VALUE=DATE:' + formatIcsDatum(datum),
+    'DTEND;VALUE=DATE:' + formatIcsDatum(morgen),
+    'SUMMARY:Eten - ' + receptNaam,
+    'DESCRIPTION:' + beschrijving,
+    'END:VEVENT', 'END:VCALENDAR'
+  ].join('\r\n');
+  var blob = new Blob([ics], {type: 'text/calendar;charset=utf-8'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = 'eten.ics';
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  setTimeout(function() { URL.revokeObjectURL(url); }, 1000);
+  setTimeout(function() {
+    alert('Agenda item aangemaakt voor ' + dagTekst + '.\nOpen het gedownloade bestand om toe te voegen aan iCloud agenda.');
+  }, 300);
+}
+
+function parseDag(tekst) {
+  var nu = new Date(); nu.setHours(12, 0, 0, 0);
+  var t = tekst.toLowerCase().trim();
+  if(t === 'morgen') { nu.setDate(nu.getDate() + 1); return nu; }
+  if(t === 'overmorgen') { nu.setDate(nu.getDate() + 2); return nu; }
+  var dagen = ['zondag','maandag','dinsdag','woensdag','donderdag','vrijdag','zaterdag'];
+  var di = dagen.indexOf(t);
+  if(di !== -1) {
+    var diff = di - nu.getDay();
+    if(diff <= 0) diff += 7;
+    nu.setDate(nu.getDate() + diff);
+    return nu;
+  }
+  var maanden = ['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'];
+  var delen = tekst.trim().split(' ');
+  if(delen.length >= 2) {
+    var dag = parseInt(delen[0]);
+    var mi = maanden.indexOf(delen[1].toLowerCase());
+    if(!isNaN(dag) && mi !== -1) return new Date(nu.getFullYear(), mi, dag, 12);
+  }
+  var p = new Date(tekst);
+  return isNaN(p) ? nu : p;
+}
+
+function formatIcsDate(d) {
+  return d.getUTCFullYear() + pad(d.getUTCMonth()+1) + pad(d.getUTCDate()) + 'T' + pad(d.getUTCHours()) + pad(d.getUTCMinutes()) + pad(d.getUTCSeconds()) + 'Z';
+}
+function formatIcsDatum(d) { return d.getFullYear() + pad(d.getMonth()+1) + pad(d.getDate()); }
+function pad(n) { return String(n).padStart(2, '0'); }
+
 
 // ============ BOODSCHAPPEN ============
 function toggleGekocht(id) {
