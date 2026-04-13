@@ -699,7 +699,8 @@ function renderAlarm() {
   var totaal = alarms.verlopen.length + alarms.kritiek.length + alarms.warn.length + alarms.bijna.length + alarms.minimum.length;
 
   if(totaal === 0) {
-    panel.innerHTML = '<div class="alarm-leeg"><div class="alarm-leeg-icon">✅</div><p>Alles in orde!<br>Geen producten verlopen of bijna op.</p></div>';
+    alarmSelectie = {};
+    panel.innerHTML = '<div class="alarm-leeg"><div class="alarm-leeg-icon">\u2705</div><p>Alles in orde!<br>Geen producten verlopen of bijna op.</p></div>';
     return;
   }
 
@@ -707,12 +708,18 @@ function renderAlarm() {
 
   function alarmSectie(items, klasse, titel, badgeKlasse, labelFn) {
     if(!items.length) return '';
-    var s = '<div class="alarm-card"><div class="alarm-card-header ' + klasse + '">' + titel + ' (' + items.length + ')</div>';
+    var s = '<div class="alarm-card"><div class="alarm-card-header ' + klasse + '" style="justify-content:space-between">';
+    s += '<span>' + titel + ' (' + items.length + ')</span>';
+    s += '<button onclick="selecteerAlarmSectie(this)" data-ids="' + items.map(function(a){ return a.prod.id; }).join(',') + '" style="background:none;border:none;font-size:11px;font-weight:800;cursor:pointer;color:inherit;font-family:Nunito,sans-serif;text-decoration:underline">Selecteer alle</button>';
+    s += '</div>';
     items.forEach(function(a) {
-      s += '<div class="alarm-item" onclick="bewerk(\'' + a.prod.id + '\')">';
-      s += '<div class="alarm-item-icon">' + (a.prod.icon||'📦') + '</div>';
-      s += '<div class="alarm-item-info"><div class="alarm-item-naam">' + a.prod.naam + '</div>';
-      s += '<div class="alarm-item-detail">' + locNaam(a.prod.locatie) + (a.prod.aantal ? ' · ' + a.prod.aantal : '') + '</div></div>';
+      var id = a.prod.id;
+      var geselecteerd = alarmSelectie[id] === true;
+      s += '<div class="alarm-item" style="background:' + (geselecteerd ? '#E8F5E9' : 'var(--card)') + '">';
+      s += '<div onclick="toggleAlarmSelectie(\'' + id + '\')" style="width:22px;height:22px;border-radius:50%;border:2px solid ' + (geselecteerd ? '#43A047' : 'var(--border)') + ';background:' + (geselecteerd ? '#43A047' : 'transparent') + ';display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:12px;color:#fff;font-weight:900">' + (geselecteerd ? '\u2713' : '') + '</div>';
+      s += '<div class="alarm-item-icon" onclick="bewerk(\'' + id + '\')" style="cursor:pointer">' + (a.prod.icon || '\uD83D\uDCE6') + '</div>';
+      s += '<div class="alarm-item-info" onclick="bewerk(\'' + id + '\')" style="cursor:pointer"><div class="alarm-item-naam">' + a.prod.naam + '</div>';
+      s += '<div class="alarm-item-detail">' + locNaam(a.prod.locatie) + (a.prod.aantal ? ' \u00B7 ' + a.prod.aantal : '') + '</div></div>';
       s += '<span class="alarm-item-badge ' + badgeKlasse + '">' + labelFn(a) + '</span>';
       s += '</div>';
     });
@@ -720,18 +727,85 @@ function renderAlarm() {
     return s;
   }
 
-  html += alarmSectie(alarms.verlopen, 'danger', '⛔ Verlopen', 'badge-danger', function(a){ return Math.abs(a.dagen) + 'd verlopen'; });
-  html += alarmSectie(alarms.kritiek, 'danger', '🔴 Verloopt snel', 'badge-danger', function(a){ return 'nog ' + a.dagen + ' dag(en)'; });
-  html += alarmSectie(alarms.warn, 'warn', '🟡 Let op datum', 'badge-warn', function(a){ return 'nog ' + a.dagen + ' dagen'; });
-  html += alarmSectie(alarms.bijna, 'bijna', '🟠 Op of bijna op', 'badge-bijna', function(a){ return a.reden; });
-  html += alarmSectie(alarms.minimum, 'warn', '📦 Onder minimale voorraad', 'badge-warn', function(a){ return 'min. ' + a.min + (a.prod.naam && isStukProduct(a.prod) ? ' stuks' : ''); });
+  html += alarmSectie(alarms.verlopen, 'danger', '\u26D4 Verlopen', 'badge-danger', function(a){ return Math.abs(a.dagen) + 'd verlopen'; });
+  html += alarmSectie(alarms.kritiek, 'danger', '\uD83D\uDD34 Verloopt snel', 'badge-danger', function(a){ return 'nog ' + a.dagen + ' dag(en)'; });
+  html += alarmSectie(alarms.warn, 'warn', '\uD83D\uDFE1 Let op datum', 'badge-warn', function(a){ return 'nog ' + a.dagen + ' dagen'; });
+  html += alarmSectie(alarms.bijna, 'bijna', '\uD83D\uDFE0 Op of bijna op', 'badge-bijna', function(a){ return a.reden; });
+  html += alarmSectie(alarms.minimum, 'warn', '\uD83D\uDCE6 Onder minimale voorraad', 'badge-warn', function(a){ return 'min. ' + a.min + ' ' + getMinEenheid(a.prod); });
 
-  html += '<div style="margin-top:12px;padding:10px 14px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)">';
-  html += '<p style="font-size:12px;color:var(--muted);font-weight:600">Tik op een product om de status bij te werken. Bijgewerkte producten verdwijnen automatisch uit de alarmlijst.</p>';
+  var aantalGeselecteerd = Object.keys(alarmSelectie).filter(function(k){ return alarmSelectie[k]; }).length;
+
+  html += '<div style="margin-top:14px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;box-shadow:var(--shadow)">';
+  html += '<div style="display:flex;gap:8px;margin-bottom:10px">';
+  html += '<button onclick="selecteerAlleAlarms()" style="flex:1;padding:9px;background:var(--card2);border:1px solid var(--border);border-radius:var(--radius-sm);font-family:Nunito,sans-serif;font-size:12px;font-weight:800;color:var(--text);cursor:pointer">Selecteer alles</button>';
+  html += '<button onclick="deselecteerAlleAlarms()" style="flex:1;padding:9px;background:var(--card2);border:1px solid var(--border);border-radius:var(--radius-sm);font-family:Nunito,sans-serif;font-size:12px;font-weight:800;color:var(--muted);cursor:pointer">Deselecteer</button>';
+  html += '</div>';
+  html += '<button onclick="voegGeselecteerdeToeBoodschappen()" style="width:100%;padding:13px;background:' + (aantalGeselecteerd > 0 ? 'var(--text)' : 'var(--card2)') + ';border:none;border-radius:var(--radius);font-family:Nunito,sans-serif;font-size:14px;font-weight:900;color:' + (aantalGeselecteerd > 0 ? '#fff' : 'var(--muted)') + ';cursor:pointer">';
+  html += aantalGeselecteerd > 0 ? '\uD83D\uDED2 Voeg ' + aantalGeselecteerd + ' product(en) toe aan boodschappenlijst' : '\uD83D\uDED2 Selecteer producten om toe te voegen';
+  html += '</button>';
+  html += '<p style="font-size:11px;color:var(--muted);font-weight:600;margin-top:8px;text-align:center">Tik op product naam om te bewerken</p>';
   html += '</div>';
 
   panel.innerHTML = html;
 }
+
+var alarmSelectie = {};
+
+function toggleAlarmSelectie(id) {
+  alarmSelectie[id] = !alarmSelectie[id];
+  renderAlarm();
+}
+
+function selecteerAlarmSectie(btn) {
+  var ids = btn.getAttribute('data-ids').split(',').filter(function(id){ return id; });
+  ids.forEach(function(id){ alarmSelectie[id] = true; });
+  renderAlarm();
+}
+
+function selecteerAlleAlarms() {
+  var alarms = berekenAlarms();
+  var alle = alarms.verlopen.concat(alarms.kritiek).concat(alarms.warn).concat(alarms.bijna).concat(alarms.minimum);
+  alle.forEach(function(a){ alarmSelectie[a.prod.id] = true; });
+  renderAlarm();
+}
+
+function deselecteerAlleAlarms() {
+  alarmSelectie = {};
+  renderAlarm();
+}
+
+function voegGeselecteerdeToeBoodschappen() {
+  var alarms = berekenAlarms();
+  var alle = alarms.verlopen.concat(alarms.kritiek).concat(alarms.warn).concat(alarms.bijna).concat(alarms.minimum);
+  var toegevoegd = 0;
+  alle.forEach(function(a) {
+    if(!alarmSelectie[a.prod.id]) return;
+    var p = a.prod;
+    if(a.ontbreekt) {
+      var snelItem = getSnelItem(p.naam);
+      producten.push({
+        id: 'p' + Date.now() + Math.floor(Math.random()*10000),
+        naam: p.naam, icon: p.icon || '\uD83D\uDCE6',
+        locatie: p.locatie || 'koelkast',
+        categorie: snelItem ? snelItem.cat : 'Overig',
+        status: 'op', aantal: '', datum: ''
+      });
+    } else {
+      producten.forEach(function(prod) {
+        if(prod.id === p.id && prod.status !== 'op' && prod.status !== 'bijna') prod.status = 'op';
+      });
+    }
+    toegevoegd++;
+  });
+  if(toegevoegd > 0) {
+    alarmSelectie = {};
+    slaMetSync(); render();
+    var boodschapTab = document.querySelector('.tab.t-boodschappen');
+    if(boodschapTab) toonTab('boodschappen', boodschapTab);
+  }
+}
+
+
 
 // ============ RENDER ============
 function render() {
@@ -828,7 +902,7 @@ function renderBoodschappen() {
     }
   });
 
-  var lijst = Object.values(lijstIds).sort(function(a,b){ return a.prioriteit - b.prioriteit; });
+  var lijst = Object.keys(lijstIds).map(function(k){ return lijstIds[k]; }).sort(function(a,b){ return a.prioriteit - b.prioriteit; });
 
   if(lijst.length === 0) {
     badge.style.display = 'none';
@@ -868,6 +942,7 @@ function renderBoodschappen() {
 }
 
 function boodschapItem(p, item) {
+  if(!p) return '';
   var gk = boodschappenGekocht.indexOf(p.id) !== -1;
   var lk = {koelkast:'bl-koelkast',vriezer:'bl-vriezer',droog:'bl-droog'}[p.locatie]||'bl-droog';
   var subTekst = p.aantal || '';
@@ -1287,13 +1362,92 @@ function pad(n) { return String(n).padStart(2, '0'); }
 
 // ============ BOODSCHAPPEN ============
 function toggleGekocht(id) {
+  // Fake min_ IDs niet opslaan in boodschappenGekocht
+  if(id && id.indexOf('min_') === 0) {
+    // Zoek het echte product op naam
+    var naam = id.replace('min_', '');
+    var echt = producten.find(function(p){ return p.naam === naam; });
+    if(!echt) return;
+    id = echt.id;
+  }
   var i = boodschappenGekocht.indexOf(id);
   if(i===-1) boodschappenGekocht.push(id); else boodschappenGekocht.splice(i,1);
   slaBoodschappen(); renderBoodschappen();
 }
+var inkoopIds = [];
+var inkoopIndex = 0;
+
 function wisBoodschappenLijst() {
-  boodschappenGekocht.forEach(function(id){ var p=producten.find(function(x){return x.id===id;}); if(p) p.status='vol'; });
-  boodschappenGekocht=[];
+  inkoopIds = boodschappenGekocht.filter(function(id) {
+    return producten.some(function(p){ return p.id === id; });
+  });
+  inkoopIndex = 0;
+  if(inkoopIds.length === 0) {
+    boodschappenGekocht = [];
+    slaMetSync(); slaBoodschappen(); render();
+    return;
+  }
+  toonInkoopPopup();
+}
+
+function toonInkoopPopup() {
+  if(inkoopIndex >= inkoopIds.length) {
+    sluitInkoopPopup();
+    return;
+  }
+  var id = inkoopIds[inkoopIndex];
+  var p = producten.find(function(x){ return x.id === id; });
+  if(!p) { inkoopIndex++; toonInkoopPopup(); return; }
+
+  var eenheid = getMinEenheid(p) || 'stuks';
+  document.getElementById('inkoop-voortgang').textContent = 'Product ' + (inkoopIndex+1) + ' van ' + inkoopIds.length;
+  document.getElementById('inkoop-product-naam').textContent = (p.icon||'') + ' ' + p.naam;
+  document.getElementById('inkoop-product-sub').textContent = 'Hoeveel gekocht? (in ' + eenheid + ')' + (p.aantal ? ' — had: ' + p.aantal : '');
+  var inp = document.getElementById('inkoop-input');
+  inp.value = '';
+  document.getElementById('inkoop-overlay').classList.add('open');
+  setTimeout(function(){ inp.focus(); }, 150);
+}
+
+function bevestigInkoop() {
+  var id = inkoopIds[inkoopIndex];
+  var p = producten.find(function(x){ return x.id === id; });
+  var inp = document.getElementById('inkoop-input');
+  var val = inp ? inp.value.trim() : '';
+  if(p) {
+    if(val !== '') {
+      var num = parseFloat(val);
+      p.aantal = val;
+      if(!isNaN(num)) {
+        p.status = (isStukProduct(p) && num <= 1) ? 'bijna' : 'vol';
+      } else {
+        p.status = 'vol';
+      }
+    } else {
+      p.status = 'vol';
+      var min = getMinimum(p);
+      if(isStukProduct(p) && min > 0) p.aantal = String(min);
+    }
+  }
+  inkoopIndex++;
+  toonInkoopPopup();
+}
+
+function slaInkoopOver() {
+  var id = inkoopIds[inkoopIndex];
+  var p = producten.find(function(x){ return x.id === id; });
+  if(p) p.status = 'vol';
+  inkoopIndex++;
+  toonInkoopPopup();
+}
+
+function stopInkoop() {
+  sluitInkoopPopup();
+}
+
+function sluitInkoopPopup() {
+  document.getElementById('inkoop-overlay').classList.remove('open');
+  boodschappenGekocht = [];
   slaMetSync(); slaBoodschappen(); render();
 }
 
