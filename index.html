@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Voorraad">
+<meta name="app-versie" content="1.0">
+<title>Voorraad</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F5F6FA;
+  --card: #FFFFFF;
+  --card2: #F0F1F6;
+  --card3: #E8EAF2;
+  --text: #1A1D2E;
+  --muted: #8890B0;
+  --border: #E2E5F0;
+  --c-koelkast: #2979FF;
+  --c-vriezer: #00BFA5;
+  --c-droog: #FF8F00;
+  --c-danger: #F44336;
+  --c-warn: #FF9800;
+  --c-ok: #43A047;
+  --c-purple: #7B61FF;
+  --shadow: 0 1px 4px rgba(0,0,0,0.07);
+  --radius: 14px;
+  --radius-sm: 10px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; width: 100%; background: var(--bg); font-family: 'Nunito', sans-serif; color: var(--text); overflow: hidden; }
+.app { display: flex; flex-direction: column; height: 100vh; padding-top: max(env(safe-area-inset-top), 16px); }
+
+/* Header */
+.header { padding: 0 16px 10px; flex-shrink: 0; }
+.header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.header h1 { font-size: 22px; font-weight: 900; color: var(--text); }
+.header-btns { display: flex; gap: 6px; }
+.hbtn { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 7px 13px; font-family: 'Nunito', sans-serif; font-size: 12px; font-weight: 800; color: var(--text); cursor: pointer; box-shadow: var(--shadow); }
+.hbtn:active { transform: scale(0.96); background: var(--card2); }
+
+/* Herinnering banner */
+.herinnering-banner { margin: 0 16px 10px; background: #FFF8E1; border: 1px solid #FFD54F; border-radius: var(--radius); padding: 10px 14px; display: none; cursor: pointer; }
+.herinnering-banner.zichtbaar { display: block; }
+.herinnering-titel { font-size: 12px; font-weight: 900; color: #E65100; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; }
+.herinnering-item { font-size: 12px; color: #5D4037; font-weight: 600; padding: 2px 0; display: flex; align-items: center; gap: 6px; }
+
+/* Zoekbalk */
+.zoek-wrap { position: relative; margin: 0 16px 10px; }
+.zoek-input { width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 9px 14px 9px 34px; font-family: 'Nunito', sans-serif; font-size: 14px; color: var(--text); outline: none; box-shadow: var(--shadow); }
+.zoek-input::placeholder { color: var(--muted); }
+.zoek-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); font-size: 14px; color: var(--muted); }
+
+/* Tabs */
+.tabs { display: flex; gap: 5px; padding: 0 16px 10px; flex-shrink: 0; overflow-x: auto; }
+.tabs::-webkit-scrollbar { display: none; }
+.tab { flex: 1; min-width: 60px; padding: 8px 4px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--card); font-family: 'Nunito', sans-serif; font-size: 11px; font-weight: 800; color: var(--muted); cursor: pointer; text-align: center; box-shadow: var(--shadow); transition: all 0.15s; white-space: nowrap; }
+.tab:active { transform: scale(0.96); }
+.tab-icon { font-size: 16px; display: block; margin-bottom: 2px; }
+.tab.t-koelkast.active { background: #E3F2FD; border-color: var(--c-koelkast); color: var(--c-koelkast); }
+.tab.t-vriezer.active { background: #E0F2F1; border-color: var(--c-vriezer); color: var(--c-vriezer); }
+.tab.t-droog.active { background: #FFF8E1; border-color: var(--c-droog); color: var(--c-droog); }
+.tab.t-alarm.active { background: #FFF3E0; border-color: var(--c-danger); color: var(--c-danger); }
+.tab.t-boodschappen.active { background: #F3E5F5; border-color: #9C27B0; color: #9C27B0; }
+.tab.t-claude.active { background: #EDE7F6; border-color: var(--c-purple); color: var(--c-purple); }
+.badge-tab { display: inline-block; background: var(--c-danger); color: #fff; border-radius: 99px; font-size: 9px; padding: 1px 5px; margin-left: 3px; font-weight: 900; }
+
+/* Content */
+.content { flex: 1; overflow-y: auto; padding: 0 16px 100px; -webkit-overflow-scrolling: touch; }
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* Categorie header */
+.cat-header { display: flex; align-items: center; gap: 8px; margin: 14px 0 7px; }
+.cat-label { font-size: 10px; font-weight: 900; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; white-space: nowrap; }
+.cat-lijn { flex: 1; height: 1px; background: var(--border); }
+
+/* Product card */
+.prod-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 11px 13px; margin-bottom: 7px; display: flex; align-items: center; gap: 11px; cursor: pointer; box-shadow: var(--shadow); transition: all 0.15s; }
+.prod-card:active { transform: scale(0.98); background: var(--card2); }
+.prod-card.status-op { opacity: 0.55; }
+.prod-card.heeft-alarm { border-left: 3px solid var(--c-danger); }
+.prod-card.heeft-warn { border-left: 3px solid var(--c-warn); }
+.prod-icon { font-size: 26px; flex-shrink: 0; }
+.prod-info { flex: 1; min-width: 0; }
+.prod-naam { font-size: 14px; font-weight: 700; color: var(--text); }
+.prod-detail { font-size: 11px; color: var(--muted); margin-top: 1px; font-weight: 600; }
+.prod-houdbaar { font-size: 11px; margin-top: 3px; font-weight: 700; }
+.prod-houdbaar.ok { color: var(--c-ok); }
+.prod-houdbaar.warn { color: var(--c-warn); }
+.prod-houdbaar.danger { color: var(--c-danger); }
+.prod-right { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex-shrink: 0; }
+.status-pill { font-size: 10px; font-weight: 800; padding: 3px 9px; border-radius: 99px; }
+.s-vol { background: #E8F5E9; color: #388E3C; }
+.s-half { background: #FFF8E1; color: #F57F17; }
+.s-bijna { background: #FFF3E0; color: #E65100; }
+.s-op { background: #FFEBEE; color: #C62828; }
+
+/* Stats */
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; margin-bottom: 14px; }
+.stat { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 8px; text-align: center; box-shadow: var(--shadow); }
+.stat-num { font-size: 20px; font-weight: 900; }
+.stat-label { font-size: 9px; color: var(--muted); font-weight: 700; margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+/* Alarm panel */
+.alarm-sectie { margin-bottom: 16px; }
+.alarm-card { background: var(--card); border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; box-shadow: var(--shadow); margin-bottom: 8px; }
+.alarm-card-header { padding: 10px 14px; font-size: 12px; font-weight: 900; display: flex; align-items: center; gap: 6px; }
+.alarm-card-header.danger { background: #FFEBEE; color: #C62828; }
+.alarm-card-header.warn { background: #FFF8E1; color: #E65100; }
+.alarm-card-header.bijna { background: #FFF3E0; color: #BF360C; }
+.alarm-item { padding: 9px 14px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 10px; cursor: pointer; }
+.alarm-item:active { background: var(--card2); }
+.alarm-item-icon { font-size: 22px; flex-shrink: 0; }
+.alarm-item-info { flex: 1; }
+.alarm-item-naam { font-size: 13px; font-weight: 700; color: var(--text); }
+.alarm-item-detail { font-size: 11px; color: var(--muted); font-weight: 600; margin-top: 1px; }
+.alarm-item-badge { font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 99px; flex-shrink: 0; }
+.badge-danger { background: #FFEBEE; color: #C62828; }
+.badge-warn { background: #FFF8E1; color: #E65100; }
+.badge-bijna { background: #FFF3E0; color: #BF360C; }
+.alarm-leeg { text-align: center; padding: 40px 20px; }
+.alarm-leeg-icon { font-size: 48px; margin-bottom: 10px; }
+.alarm-leeg p { font-size: 14px; color: var(--muted); font-weight: 600; }
+
+/* Boodschappenlijst */
+.boodschap-item { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 11px 13px; margin-bottom: 7px; display: flex; align-items: center; gap: 11px; box-shadow: var(--shadow); }
+.boodschap-item.gekocht { opacity: 0.4; }
+.boodschap-check { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; font-size: 12px; transition: all 0.15s; }
+.boodschap-check.aan { background: var(--c-ok); border-color: var(--c-ok); color: #fff; }
+.boodschap-naam { flex: 1; font-size: 13px; font-weight: 700; color: var(--text); }
+.boodschap-sub { font-size: 11px; color: var(--muted); font-weight: 600; }
+.boodschap-loc { font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 99px; flex-shrink: 0; }
+.bl-koelkast { background: #E3F2FD; color: var(--c-koelkast); }
+.bl-vriezer { background: #E0F2F1; color: var(--c-vriezer); }
+.bl-droog { background: #FFF8E1; color: var(--c-droog); }
+
+/* Update banner */
+.update-banner { margin: 0 16px 8px; background: #E8F5E9; border: 1px solid #81C784; border-radius: var(--radius); padding: 10px 14px; display: none; align-items: center; gap: 10px; }
+.update-banner.zichtbaar { display: flex; }
+.update-tekst { flex: 1; font-size: 13px; font-weight: 700; color: #2E7D32; }
+.update-btn { background: #43A047; border: none; border-radius: 99px; padding: 6px 14px; font-family: Nunito,sans-serif; font-size: 12px; font-weight: 800; color: #fff; cursor: pointer; flex-shrink: 0; }
+.update-btn:active { transform: scale(0.96); }
+
+/* Sync indicator */
+.sync-bar { display: flex; align-items: center; gap: 6px; padding: 4px 16px 0; flex-shrink: 0; }
+.sync-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--c-ok); flex-shrink: 0; }
+.sync-dot.bezig { background: var(--c-warn); animation: pulse 1s infinite; }
+.sync-dot.fout { background: var(--c-danger); }
+.sync-tekst { font-size: 11px; color: var(--muted); font-weight: 700; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.leeg { text-align: center; padding: 40px 20px; }
+.leeg-icon { font-size: 44px; margin-bottom: 10px; }
+.leeg p { font-size: 14px; color: var(--muted); font-weight: 600; }
+
+/* FAB */
+.fab { position: fixed; bottom: max(env(safe-area-inset-bottom), 16px); right: 20px; width: 52px; height: 52px; border-radius: 50%; background: var(--text); border: none; font-size: 26px; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(0,0,0,0.18); z-index: 50; }
+.fab:active { transform: scale(0.93); }
+
+/* Sheet overlay */
+.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 100; align-items: flex-end; justify-content: center; }
+.overlay.open { display: flex; }
+.sheet { background: var(--card); border-radius: 22px 22px 0 0; padding: 18px 18px max(env(safe-area-inset-bottom), 18px); width: 100%; max-height: 92vh; overflow-y: auto; }
+.sheet-handel { width: 36px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 14px; }
+.sheet h2 { font-size: 17px; font-weight: 900; margin-bottom: 14px; color: var(--text); }
+.form-label { font-size: 11px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; display: block; }
+.form-input { width: 100%; background: var(--card2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 13px; font-family: 'Nunito', sans-serif; font-size: 14px; color: var(--text); outline: none; margin-bottom: 12px; }
+.form-input:focus { border-color: var(--c-koelkast); }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.seg { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 12px; }
+.seg-btn { flex: 1; min-width: 56px; padding: 8px 4px; background: var(--card2); border: 1px solid var(--border); border-radius: var(--radius-sm); font-family: 'Nunito', sans-serif; font-size: 11px; font-weight: 800; color: var(--muted); cursor: pointer; text-align: center; }
+.seg-btn.active { background: var(--text); color: #fff; border-color: var(--text); }
+.btn-primary { width: 100%; padding: 13px; background: var(--text); border: none; border-radius: var(--radius); font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 900; color: #fff; cursor: pointer; margin-top: 4px; }
+.btn-primary:active { transform: scale(0.97); opacity: 0.9; }
+.btn-sec { width: 100%; padding: 11px; background: transparent; border: 1px solid var(--border); border-radius: var(--radius); font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 700; color: var(--muted); cursor: pointer; margin-top: 7px; }
+.btn-danger-outline { width: 100%; padding: 11px; background: transparent; border: 1px solid var(--c-danger); border-radius: var(--radius); font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 700; color: var(--c-danger); cursor: pointer; margin-top: 7px; }
+.snel-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-bottom: 12px; max-height: 180px; overflow-y: auto; }
+.snel-item { background: var(--card2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 7px 4px; text-align: center; cursor: pointer; font-size: 11px; font-weight: 700; color: var(--muted); }
+.snel-item:active { background: var(--card3); color: var(--text); }
+
+/* Recept */
+.recept-item { background: var(--card2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 11px 13px; cursor: pointer; margin-bottom: 7px; }
+.recept-item:active { background: var(--card3); }
+.recept-naam { font-size: 13px; font-weight: 800; color: var(--text); }
+.recept-ing { font-size: 11px; color: var(--muted); margin-top: 3px; font-weight: 600; }
+.recept-ok { font-size: 11px; color: var(--c-ok); margin-top: 4px; font-weight: 700; }
+.recept-warn { font-size: 11px; color: var(--c-warn); margin-top: 4px; font-weight: 700; }
+
+/* Claude chat */
+.chat-wrap { display: flex; flex-direction: column; height: 100%; }
+.geheugen-blok { background: #EDE7F6; border: 1px solid #D1C4E9; border-radius: var(--radius); padding: 11px 13px; margin-bottom: 12px; }
+.geheugen-titel { font-size: 11px; font-weight: 900; color: var(--c-purple); text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.geheugen-item { display: flex; align-items: center; gap: 8px; padding: 5px 0; border-bottom: 1px solid #D1C4E9; }
+.geheugen-item:last-child { border-bottom: none; }
+.geheugen-tekst { flex: 1; font-size: 12px; font-weight: 600; color: var(--text); }
+.geheugen-del { background: none; border: none; color: var(--muted); font-size: 14px; cursor: pointer; padding: 0; }
+.geheugen-leeg { font-size: 12px; color: var(--muted); font-style: italic; }
+.pin-btn { background: var(--c-purple); border: none; border-radius: 99px; padding: 4px 10px; font-family: Nunito,sans-serif; font-size: 11px; font-weight: 800; color: #fff; cursor: pointer; }
+.snelvraag-wrap { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+.snelvraag { background: var(--card); border: 1px solid var(--border); border-radius: 99px; padding: 5px 11px; font-size: 11px; font-weight: 700; color: var(--text); cursor: pointer; box-shadow: var(--shadow); }
+.snelvraag:active { background: var(--card2); }
+.chat-msgs { flex: 1; overflow-y: auto; padding-bottom: 6px; }
+.msg { margin-bottom: 10px; display: flex; flex-direction: column; }
+.msg.user { align-items: flex-end; }
+.msg.claude { align-items: flex-start; }
+.msg-label { font-size: 10px; color: var(--muted); font-weight: 800; margin-bottom: 3px; padding: 0 3px; }
+.msg-bubble { max-width: 86%; padding: 9px 13px; border-radius: 14px; font-size: 13px; line-height: 1.5; font-weight: 600; }
+.msg.user .msg-bubble { background: var(--text); color: #fff; border-bottom-right-radius: 3px; }
+.msg.claude .msg-bubble { background: var(--card); color: var(--text); border-bottom-left-radius: 3px; border: 1px solid var(--border); box-shadow: var(--shadow); }
+.pin-chat-btn { background: none; border: none; color: var(--c-purple); font-size: 10px; font-weight: 800; cursor: pointer; padding: 3px 0 0; font-family: Nunito,sans-serif; }
+.chat-input-wrap { display: flex; gap: 7px; padding: 10px 0 0; border-top: 1px solid var(--border); flex-shrink: 0; }
+.chat-input { flex: 1; background: var(--card2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 9px 13px; font-family: 'Nunito', sans-serif; font-size: 13px; color: var(--text); outline: none; resize: none; max-height: 90px; }
+.chat-input:focus { border-color: var(--c-purple); }
+.chat-send { background: var(--text); border: none; border-radius: var(--radius-sm); width: 40px; height: 40px; font-size: 18px; color: #fff; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; align-self: flex-end; }
+.chat-send:active { transform: scale(0.93); }
+.chat-send:disabled { background: var(--card2); color: var(--muted); }
+.chat-welkom { background: var(--card2); border: 1px solid var(--border); border-radius: var(--radius); padding: 11px 13px; margin-bottom: 12px; font-size: 12px; color: var(--muted); line-height: 1.6; }
+.chat-welkom strong { color: var(--text); }
+.typing { display: flex; gap: 4px; align-items: center; padding: 9px 13px; background: var(--card); border-radius: 14px; border-bottom-left-radius: 3px; border: 1px solid var(--border); width: fit-content; box-shadow: var(--shadow); }
+.typing span { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); animation: bounce 1.2s infinite; }
+.typing span:nth-child(2) { animation-delay: 0.2s; }
+.typing span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-5px)} }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div class="header-top">
+      <h1>🏠 Voorraad</h1>
+      <div class="header-btns">
+        <button class="hbtn" onclick="openRecept()">🍽 Recept</button>
+        <button class="hbtn" onclick="openToevoegen()">+ Nieuw</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sync bar -->
+  <div class="sync-bar">
+    <div class="sync-dot" id="sync-dot"></div>
+    <span class="sync-tekst" id="sync-tekst">Verbinden...</span>
+  </div>
+
+  <!-- Update banner -->
+  <div class="update-banner" id="update-banner">
+    <span class="update-tekst">🆕 Nieuwe versie beschikbaar!</span>
+    <button class="update-btn" onclick="voerUpdateUit()">Installeer</button>
+  </div>
+
+  <!-- Herinnering banner -->
+  <div class="herinnering-banner" id="herinnering-banner" onclick="toonTabDirect('alarm')">
+    <div class="herinnering-titel">
+      <span>⚠️ Aandacht nodig</span>
+      <span style="font-size:10px;font-weight:700">Tik om te bekijken →</span>
+    </div>
+    <div id="herinnering-items"></div>
+  </div>
+
+  <!-- Zoekbalk -->
+  <div class="zoek-wrap">
+    <span class="zoek-icon">🔍</span>
+    <input class="zoek-input" type="text" placeholder="Zoek product..." oninput="zoek(this.value)" id="zoekInput">
+  </div>
+
+  <div class="tabs" id="tabs">
+    <button class="tab t-koelkast active" onclick="toonTab('koelkast',this)"><span class="tab-icon">🧊</span>Koelkast</button>
+    <button class="tab t-vriezer" onclick="toonTab('vriezer',this)"><span class="tab-icon">❄️</span>Vriezer</button>
+    <button class="tab t-droog" onclick="toonTab('droog',this)"><span class="tab-icon">🥫</span>Droog</button>
+    <button class="tab t-alarm" onclick="toonTab('alarm',this)"><span class="tab-icon">🔔</span>Alarm<span class="badge-tab" id="badge-alarm" style="display:none">0</span></button>
+    <button class="tab t-boodschappen" onclick="toonTab('boodschappen',this)"><span class="tab-icon">🛒</span>Lijst<span class="badge-tab" id="badge-boodschappen" style="display:none">0</span></button>
+    <button class="tab t-claude" onclick="toonTab('claude',this)"><span class="tab-icon">🤖</span>Claude</button>
+  </div>
+
+  <div class="content">
+    <div id="panel-koelkast" class="panel active"></div>
+    <div id="panel-vriezer" class="panel"></div>
+    <div id="panel-droog" class="panel"></div>
+    <div id="panel-alarm" class="panel"></div>
+    <div id="panel-boodschappen" class="panel"></div>
+    <div id="panel-claude" class="panel"></div>
+    <div id="panel-zoek" class="panel"></div>
+  </div>
+</div>
+
+<button class="fab" onclick="openToevoegen()">+</button>
+
+<!-- Toevoegen/bewerken sheet -->
+<div class="overlay" id="overlay-toevoegen">
+  <div class="sheet">
+    <div class="sheet-handel"></div>
+    <h2 id="sheet-titel">Product toevoegen</h2>
+    <label class="form-label">Snel kiezen</label>
+    <div class="snel-list" id="snel-list"></div>
+    <label class="form-label">Naam</label>
+    <input class="form-input" id="f-naam" type="text" placeholder="Productnaam">
+    <label class="form-label">Icoon</label>
+    <input class="form-input" id="f-icon" type="text" placeholder="🥩">
+    <label class="form-label">Locatie</label>
+    <div class="seg" id="seg-locatie">
+      <button class="seg-btn active" data-val="koelkast" onclick="segKies('locatie',this)">🧊 Koelkast</button>
+      <button class="seg-btn" data-val="vriezer" onclick="segKies('locatie',this)">❄️ Vriezer</button>
+      <button class="seg-btn" data-val="droog" onclick="segKies('locatie',this)">🥫 Droog</button>
+    </div>
+    <label class="form-label">Categorie</label>
+    <input class="form-input" id="f-categorie" type="text" placeholder="bijv. Vlees, Zuivel, Groente...">
+    <label class="form-label">Status</label>
+    <div class="seg" id="seg-status">
+      <button class="seg-btn active" data-val="vol" onclick="segKies('status',this)">✅ Vol</button>
+      <button class="seg-btn" data-val="half" onclick="segKies('status',this)">🔶 Half</button>
+      <button class="seg-btn" data-val="bijna" onclick="segKies('status',this)">⚠️ Bijna op</button>
+      <button class="seg-btn" data-val="op" onclick="segKies('status',this)">❌ Op</button>
+    </div>
+    <div class="form-row">
+      <div>
+        <label class="form-label">Aantal / gewicht</label>
+        <input class="form-input" id="f-aantal" type="text" placeholder="3 of 500g">
+      </div>
+      <div>
+        <label class="form-label">Houdbaar tot</label>
+        <input class="form-input" id="f-datum" type="date">
+      </div>
+    </div>
+    <button class="btn-primary" onclick="slaanOp()">Opslaan</button>
+    <button class="btn-danger-outline" id="btn-verwijder" style="display:none" onclick="verwijder()">Verwijder product</button>
+    <button class="btn-sec" onclick="sluitOverlay('overlay-toevoegen')">Annuleren</button>
+  </div>
+</div>
+
+<!-- Recept sheet -->
+<div class="overlay" id="overlay-recept">
+  <div class="sheet">
+    <div class="sheet-handel"></div>
+    <h2>🍽 Recept gebruiken</h2>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:12px;font-weight:600">Kies een recept — ingrediënten worden automatisch van de voorraad afgehaald.</p>
+    <div id="recept-list"></div>
+    <button class="btn-sec" onclick="sluitOverlay('overlay-recept')">Sluiten</button>
+  </div>
+</div>
+
+<script>
+// ============ DATA ============
+var SNELLIJST = [
+  {naam:'Melk',icon:'🥛',loc:'koelkast',cat:'Zuivel'},
+  {naam:'Eieren',icon:'🥚',loc:'koelkast',cat:'Zuivel'},
+  {naam:'Boter',icon:'🧈',loc:'koelkast',cat:'Zuivel'},
+  {naam:'Kaas',icon:'🧀',loc:'koelkast',cat:'Zuivel'},
+  {naam:'Yoghurt',icon:'🍶',loc:'koelkast',cat:'Zuivel'},
+  {naam:'Gehakt',icon:'🥩',loc:'koelkast',cat:'Vlees'},
+  {naam:'Kipfilet',icon:'🍗',loc:'koelkast',cat:'Vlees'},
+  {naam:'Kippendijen',icon:'🍗',loc:'koelkast',cat:'Vlees'},
+  {naam:'Stoofvlees',icon:'🥩',loc:'koelkast',cat:'Vlees'},
+  {naam:'Varkensschouder',icon:'🥩',loc:'koelkast',cat:'Vlees'},
+  {naam:'Aardappels',icon:'🥔',loc:'koelkast',cat:'Groente'},
+  {naam:'Wortel',icon:'🥕',loc:'koelkast',cat:'Groente'},
+  {naam:'Prei',icon:'🌿',loc:'koelkast',cat:'Groente'},
+  {naam:'Courgette',icon:'🥒',loc:'koelkast',cat:'Groente'},
+  {naam:'Broccoli',icon:'🥦',loc:'koelkast',cat:'Groente'},
+  {naam:'Uien',icon:'🧅',loc:'koelkast',cat:'Groente'},
+  {naam:'Gehakt (vries)',icon:'🥩',loc:'vriezer',cat:'Vlees'},
+  {naam:'Kippendijen (vries)',icon:'🍗',loc:'vriezer',cat:'Vlees'},
+  {naam:'Stoofvlees (vries)',icon:'🥩',loc:'vriezer',cat:'Vlees'},
+  {naam:'Varkensvlees (vries)',icon:'🥩',loc:'vriezer',cat:'Vlees'},
+  {naam:'Doperwten',icon:'🟢',loc:'vriezer',cat:'Groente'},
+  {naam:'Sperziebonen',icon:'🟢',loc:'vriezer',cat:'Groente'},
+  {naam:'Snijbonen',icon:'🟢',loc:'vriezer',cat:'Groente'},
+  {naam:'Broccoli (vries)',icon:'🥦',loc:'vriezer',cat:'Groente'},
+  {naam:'Spinazie a la creme',icon:'🌿',loc:'vriezer',cat:'Groente'},
+  {naam:'Rodekool met appel',icon:'🍎',loc:'vriezer',cat:'Groente'},
+  {naam:'Spaghetti',icon:'🍝',loc:'droog',cat:'Pasta & Rijst'},
+  {naam:'Penne',icon:'🍝',loc:'droog',cat:'Pasta & Rijst'},
+  {naam:'Farfalle',icon:'🍝',loc:'droog',cat:'Pasta & Rijst'},
+  {naam:'Rijst',icon:'🍚',loc:'droog',cat:'Pasta & Rijst'},
+  {naam:'Runderbouillon',icon:'🟫',loc:'droog',cat:'Blikken & Houdbaar'},
+  {naam:'Kippenbouillon',icon:'🟡',loc:'droog',cat:'Blikken & Houdbaar'},
+  {naam:'Tomatenblokjes',icon:'🍅',loc:'droog',cat:'Blikken & Houdbaar'},
+  {naam:'Geraspte kaas',icon:'🧀',loc:'droog',cat:'Blikken & Houdbaar'},
+  {naam:'Sojasaus',icon:'🫙',loc:'droog',cat:'Sauzen & Kruiden'},
+  {naam:'Honing',icon:'🍯',loc:'droog',cat:'Sauzen & Kruiden'},
+  {naam:'Mosterd',icon:'🟡',loc:'droog',cat:'Sauzen & Kruiden'},
+  {naam:'Knoflookpoeder',icon:'🧄',loc:'droog',cat:'Sauzen & Kruiden'},
+  {naam:'Paprikapoeder',icon:'🌶️',loc:'droog',cat:'Sauzen & Kruiden'},
+  {naam:'Tijm',icon:'🌿',loc:'droog',cat:'Sauzen & Kruiden'},
+  {naam:'Italiaanse kruiden',icon:'🌿',loc:'droog',cat:'Sauzen & Kruiden'},
+  {naam:'Zout',icon:'🧂',loc:'droog',cat:'Sauzen & Kruiden'},
+  {naam:'Peper',icon:'⚫',loc:'droog',cat:'Sauzen & Kruiden'},
+  {naam:'Olijfolie',icon:'🫙',loc:'droog',cat:'Sauzen & Kruiden'},
+];
+
+var RECEPTEN = [
+  {naam:'Stoofvlees met aardappels en prei', ing:['Stoofvlees','Aardappels','Wortel','Prei','Uien']},
+  {naam:'Kippendijen met aardappels en courgette', ing:['Kippendijen','Aardappels','Courgette','Wortel','Uien']},
+  {naam:'Gehaktballen met aardappels en sperziebonen', ing:['Gehakt','Aardappels','Sperziebonen','Uien']},
+  {naam:'Varkensschouder met aardappels en snijbonen', ing:['Varkensschouder','Aardappels','Snijbonen','Broccoli','Uien']},
+  {naam:'Kip teriyaki met rijst en doperwten', ing:['Kippendijen','Rijst','Doperwten','Uien']},
+  {naam:'Gehaktballen met rijst en prei', ing:['Gehakt','Rijst','Prei','Uien']},
+  {naam:'Varkensvlees met rijst en broccoli', ing:['Varkensschouder','Rijst','Broccoli','Uien']},
+  {naam:'Stoofvlees met rijst en snijbonen', ing:['Stoofvlees','Rijst','Snijbonen','Wortel','Uien']},
+  {naam:'Spaghetti bolognese', ing:['Gehakt','Spaghetti','Uien','Tomatenblokjes']},
+  {naam:'Pasta met kip en wortel', ing:['Kippendijen','Penne','Wortel','Uien']},
+  {naam:'Pasta met rul gehakt', ing:['Gehakt','Penne','Uien','Doperwten']},
+];
+
+var producten = JSON.parse(localStorage.getItem('voorraad') || '[]');
+var boodschappenGekocht = JSON.parse(localStorage.getItem('boodschappenGekocht') || '[]');
+var chatGeschiedenis = JSON.parse(localStorage.getItem('chatGeschiedenis') || '[]');
+var vastGeheugen = JSON.parse(localStorage.getItem('vastGeheugen') || '[]');
+var bewerkId = null;
+var segWaarden = {locatie:'koelkast', status:'vol'};
+var actieveTab = 'koelkast';
+var chatBezig = false;
+
+function sla() { localStorage.setItem('voorraad', JSON.stringify(producten)); }
+function slaBoodschappen() { localStorage.setItem('boodschappenGekocht', JSON.stringify(boodschappenGekocht)); }
+
+// ============ ALARM LOGICA ============
+function berekenAlarms() {
+  var alarms = {verlopen:[], kritiek:[], warn:[], bijna:[]};
+  producten.forEach(function(p) {
+    var heeftDatumAlarm = false;
+    if(p.datum) {
+      var d = dagenTot(p.datum);
+      if(d < 0) { alarms.verlopen.push({prod:p, dagen:d}); heeftDatumAlarm = true; }
+      else if(d <= 2) { alarms.kritiek.push({prod:p, dagen:d}); heeftDatumAlarm = true; }
+      else if(d <= 5) { alarms.warn.push({prod:p, dagen:d}); heeftDatumAlarm = true; }
+    }
+    if(!heeftDatumAlarm) {
+      if(p.status === 'op') alarms.bijna.push({prod:p, reden:'Op'});
+      else if(p.status === 'bijna') alarms.bijna.push({prod:p, reden:'Bijna op'});
+    }
+  });
+  return alarms;
+}
+
+function updateHerinnering() {
+  var alarms = berekenAlarms();
+  var totaal = alarms.verlopen.length + alarms.kritiek.length + alarms.warn.length + alarms.bijna.length;
+  var banner = document.getElementById('herinnering-banner');
+  var itemsEl = document.getElementById('herinnering-items');
+  var badge = document.getElementById('badge-alarm');
+
+  if(totaal === 0) {
+    banner.classList.remove('zichtbaar');
+    badge.style.display = 'none';
+    return;
+  }
+  badge.textContent = totaal;
+  badge.style.display = 'inline-block';
+  banner.classList.add('zichtbaar');
+
+  var html = '';
+  alarms.verlopen.slice(0,2).forEach(function(a) {
+    html += '<div class="herinnering-item">⛔ <strong>' + a.prod.naam + '</strong> is verlopen (' + Math.abs(a.dagen) + ' dagen geleden)</div>';
+  });
+  alarms.kritiek.slice(0,2).forEach(function(a) {
+    html += '<div class="herinnering-item">🔴 <strong>' + a.prod.naam + '</strong> verloopt over ' + a.dagen + ' dag(en)</div>';
+  });
+  alarms.bijna.slice(0,2).forEach(function(a) {
+    html += '<div class="herinnering-item">🟡 <strong>' + a.prod.naam + '</strong> is ' + a.reden.toLowerCase() + '</div>';
+  });
+  if(totaal > 6) html += '<div class="herinnering-item" style="color:#E65100">+ nog ' + (totaal - 6) + ' meer...</div>';
+  itemsEl.innerHTML = html;
+}
+
+function renderAlarm() {
+  var panel = document.getElementById('panel-alarm');
+  var alarms = berekenAlarms();
+  var totaal = alarms.verlopen.length + alarms.kritiek.length + alarms.warn.length + alarms.bijna.length;
+
+  if(totaal === 0) {
+    panel.innerHTML = '<div class="alarm-leeg"><div class="alarm-leeg-icon">✅</div><p>Alles in orde!<br>Geen producten verlopen of bijna op.</p></div>';
+    return;
+  }
+
+  var html = '';
+
+  function alarmSectie(items, klasse, titel, badgeKlasse, labelFn) {
+    if(!items.length) return '';
+    var s = '<div class="alarm-card"><div class="alarm-card-header ' + klasse + '">' + titel + ' (' + items.length + ')</div>';
+    items.forEach(function(a) {
+      s += '<div class="alarm-item" onclick="bewerk(\'' + a.prod.id + '\')">';
+      s += '<div class="alarm-item-icon">' + (a.prod.icon||'📦') + '</div>';
+      s += '<div class="alarm-item-info"><div class="alarm-item-naam">' + a.prod.naam + '</div>';
+      s += '<div class="alarm-item-detail">' + locNaam(a.prod.locatie) + (a.prod.aantal ? ' · ' + a.prod.aantal : '') + '</div></div>';
+      s += '<span class="alarm-item-badge ' + badgeKlasse + '">' + labelFn(a) + '</span>';
+      s += '</div>';
+    });
+    s += '</div>';
+    return s;
+  }
+
+  html += alarmSectie(alarms.verlopen, 'danger', '⛔ Verlopen', 'badge-danger', function(a){ return Math.abs(a.dagen) + 'd verlopen'; });
+  html += alarmSectie(alarms.kritiek, 'danger', '🔴 Verloopt snel', 'badge-danger', function(a){ return 'nog ' + a.dagen + ' dag(en)'; });
+  html += alarmSectie(alarms.warn, 'warn', '🟡 Let op datum', 'badge-warn', function(a){ return 'nog ' + a.dagen + ' dagen'; });
+  html += alarmSectie(alarms.bijna, 'bijna', '🟠 Op of bijna op', 'badge-bijna', function(a){ return a.reden; });
+
+  html += '<div style="margin-top:12px;padding:10px 14px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)">';
+  html += '<p style="font-size:12px;color:var(--muted);font-weight:600">Tik op een product om de status bij te werken. Bijgewerkte producten verdwijnen automatisch uit de alarmlijst.</p>';
+  html += '</div>';
+
+  panel.innerHTML = html;
+}
+
+// ============ RENDER ============
+function render() {
+  renderLocatie('koelkast');
+  renderLocatie('vriezer');
+  renderLocatie('droog');
+  renderAlarm();
+  renderBoodschappen();
+  updateHerinnering();
+}
+
+function renderLocatie(loc) {
+  var panel = document.getElementById('panel-' + loc);
+  var prods = producten.filter(function(p){ return p.locatie === loc; });
+  if(prods.length === 0) {
+    panel.innerHTML = '<div class="leeg"><div class="leeg-icon">' + locIcon(loc) + '</div><p>Geen producten in ' + locNaam(loc) + '<br>Tik + om toe te voegen</p></div>';
+    return;
+  }
+  var vol = prods.filter(function(p){return p.status==='vol';}).length;
+  var aandacht = prods.filter(function(p){return p.status==='bijna'||p.status==='op'||(p.datum&&dagenTot(p.datum)<=5);}).length;
+  var html = '<div class="stats">';
+  html += '<div class="stat"><div class="stat-num" style="color:var(--c-ok)">' + vol + '</div><div class="stat-label">Op voorraad</div></div>';
+  html += '<div class="stat"><div class="stat-num" style="color:var(--c-warn)">' + aandacht + '</div><div class="stat-label">Aandacht</div></div>';
+  html += '<div class="stat"><div class="stat-num" style="color:var(--c-koelkast)">' + prods.length + '</div><div class="stat-label">Totaal</div></div>';
+  html += '</div>';
+  var cats = {};
+  prods.forEach(function(p) {
+    var c = p.categorie || 'Overig';
+    if(!cats[c]) cats[c] = [];
+    cats[c].push(p);
+  });
+  Object.keys(cats).sort().forEach(function(cat) {
+    html += '<div class="cat-header"><div class="cat-lijn"></div><div class="cat-label">' + cat + '</div><div class="cat-lijn"></div></div>';
+    cats[cat].forEach(function(p) { html += prodCard(p); });
+  });
+  panel.innerHTML = html;
+}
+
+function prodCard(p) {
+  var houdbaar = '';
+  var alarmKlasse = '';
+  if(p.datum) {
+    var d = dagenTot(p.datum);
+    if(d < 0) { houdbaar = '<div class="prod-houdbaar danger">⛔ Verlopen (' + Math.abs(d) + ' dagen geleden)</div>'; alarmKlasse = 'heeft-alarm'; }
+    else if(d <= 2) { houdbaar = '<div class="prod-houdbaar danger">🔴 Nog ' + d + ' dag(en) houdbaar!</div>'; alarmKlasse = 'heeft-alarm'; }
+    else if(d <= 5) { houdbaar = '<div class="prod-houdbaar warn">🟡 Nog ' + d + ' dagen houdbaar</div>'; alarmKlasse = 'heeft-warn'; }
+    else { houdbaar = '<div class="prod-houdbaar ok">✓ Houdbaar tot ' + formatDatum(p.datum) + '</div>'; }
+  }
+  var sk = {vol:'s-vol',half:'s-half',bijna:'s-bijna',op:'s-op'}[p.status]||'s-vol';
+  var st = {vol:'Vol',half:'Half',bijna:'Bijna op',op:'Op'}[p.status]||'';
+  return '<div class="prod-card status-' + p.status + ' ' + alarmKlasse + '" onclick="bewerk(\'' + p.id + '\')">' +
+    '<div class="prod-icon">' + (p.icon||'📦') + '</div>' +
+    '<div class="prod-info"><div class="prod-naam">' + p.naam + '</div>' +
+    (p.aantal ? '<div class="prod-detail">' + p.aantal + '</div>' : '') + houdbaar + '</div>' +
+    '<div class="prod-right"><span class="status-pill ' + sk + '">' + st + '</span></div>' +
+  '</div>';
+}
+
+function renderBoodschappen() {
+  var panel = document.getElementById('panel-boodschappen');
+  var lijst = producten.filter(function(p){ return p.status==='bijna'||p.status==='op'; });
+  var badge = document.getElementById('badge-boodschappen');
+  if(lijst.length === 0) {
+    badge.style.display = 'none';
+    panel.innerHTML = '<div class="leeg"><div class="leeg-icon">✅</div><p>Alles op voorraad!</p></div>';
+    return;
+  }
+  badge.textContent = lijst.length; badge.style.display = 'inline-block';
+  lijst.sort(function(a,b){ return ({op:0,bijna:1}[a.status]||2)-({op:0,bijna:1}[b.status]||2); });
+  var op = lijst.filter(function(p){return p.status==='op';});
+  var bijna = lijst.filter(function(p){return p.status==='bijna';});
+  var html = '';
+  if(op.length) {
+    html += '<div class="cat-header"><div class="cat-lijn"></div><div class="cat-label" style="color:var(--c-danger)">Op — moet gekocht</div><div class="cat-lijn"></div></div>';
+    op.forEach(function(p){ html += boodschapItem(p); });
+  }
+  if(bijna.length) {
+    html += '<div class="cat-header"><div class="cat-lijn"></div><div class="cat-label" style="color:var(--c-warn)">Bijna op — ook meenemen</div><div class="cat-lijn"></div></div>';
+    bijna.forEach(function(p){ html += boodschapItem(p); });
+  }
+  html += '<div style="margin-top:14px"><button class="btn-primary" id="wis-boodschappen-btn">🗑 Verwijder afgevinkte</button></div>';
+  panel.innerHTML = html;
+  document.getElementById('wis-boodschappen-btn').onclick = wisBoodschappenLijst;
+}
+
+function boodschapItem(p) {
+  var gk = boodschappenGekocht.indexOf(p.id) !== -1;
+  var lk = {koelkast:'bl-koelkast',vriezer:'bl-vriezer',droog:'bl-droog'}[p.locatie]||'bl-droog';
+  return '<div class="boodschap-item ' + (gk?'gekocht':'') + '">' +
+    '<div class="boodschap-check ' + (gk?'aan':'') + '" onclick="toggleGekocht(\'' + p.id + '\')">' + (gk?'✓':'') + '</div>' +
+    '<div style="flex:1"><div class="boodschap-naam">' + (p.icon||'📦') + ' ' + p.naam + '</div>' +
+    '<div class="boodschap-sub">' + (p.aantal||'') + ' · ' + locNaam(p.locatie) + '</div></div>' +
+    '<span class="boodschap-loc ' + lk + '">' + locNaam(p.locatie) + '</span>' +
+  '</div>';
+}
+
+// ============ TABS ============
+function toonTab(naam, el) {
+  actieveTab = naam;
+  document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
+  document.getElementById('panel-' + naam).classList.add('active');
+  el.classList.add('active');
+  document.getElementById('zoekInput').value = '';
+  if(naam === 'claude') renderClaudePanel();
+}
+
+function toonTabDirect(naam) {
+  var tabs = document.querySelectorAll('.tab');
+  tabs.forEach(function(t) {
+    if(t.textContent.toLowerCase().indexOf(naam) !== -1 || t.getAttribute('onclick').indexOf("'" + naam + "'") !== -1) {
+      toonTab(naam, t);
+    }
+  });
+}
+
+// ============ ZOEKEN ============
+function zoek(q) {
+  if(!q) {
+    document.getElementById('panel-zoek').classList.remove('active');
+    document.getElementById('panel-' + actieveTab).classList.add('active');
+    return;
+  }
+  document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('active'); });
+  document.getElementById('panel-zoek').classList.add('active');
+  var gevonden = producten.filter(function(p){ return p.naam.toLowerCase().indexOf(q.toLowerCase()) !== -1; });
+  document.getElementById('panel-zoek').innerHTML = gevonden.length ? gevonden.map(prodCard).join('') : '<div class="leeg"><div class="leeg-icon">🔍</div><p>Niets gevonden</p></div>';
+}
+
+// ============ TOEVOEGEN / BEWERKEN ============
+function openToevoegen() {
+  bewerkId = null;
+  document.getElementById('sheet-titel').textContent = 'Product toevoegen';
+  ['f-naam','f-icon','f-categorie','f-aantal','f-datum'].forEach(function(id){ document.getElementById(id).value = ''; });
+  document.getElementById('btn-verwijder').style.display = 'none';
+  segWaarden = {locatie:'koelkast',status:'vol'};
+  document.querySelectorAll('#seg-locatie .seg-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.val==='koelkast'); });
+  document.querySelectorAll('#seg-status .seg-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.val==='vol'); });
+  bouwSnellijst();
+  document.getElementById('overlay-toevoegen').classList.add('open');
+}
+
+function bewerk(id) {
+  var p = producten.find(function(x){ return x.id===id; });
+  if(!p) return;
+  bewerkId = id;
+  document.getElementById('sheet-titel').textContent = 'Product bewerken';
+  document.getElementById('f-naam').value = p.naam;
+  document.getElementById('f-icon').value = p.icon||'';
+  document.getElementById('f-categorie').value = p.categorie||'';
+  document.getElementById('f-aantal').value = p.aantal||'';
+  document.getElementById('f-datum').value = p.datum||'';
+  document.getElementById('btn-verwijder').style.display = 'block';
+  segWaarden = {locatie:p.locatie, status:p.status};
+  document.querySelectorAll('#seg-locatie .seg-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.val===p.locatie); });
+  document.querySelectorAll('#seg-status .seg-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.val===p.status); });
+  bouwSnellijst();
+  document.getElementById('overlay-toevoegen').classList.add('open');
+}
+
+function bouwSnellijst() {
+  document.getElementById('snel-list').innerHTML = SNELLIJST.map(function(s){
+    return '<div class="snel-item" onclick="vulSnel(this)" data-naam="'+s.naam+'" data-icon="'+s.icon+'" data-loc="'+s.loc+'" data-cat="'+s.cat+'">'+s.icon+'<br>'+s.naam+'</div>';
+  }).join('');
+}
+
+function vulSnel(el) {
+  document.getElementById('f-naam').value = el.dataset.naam;
+  document.getElementById('f-icon').value = el.dataset.icon;
+  document.getElementById('f-categorie').value = el.dataset.cat;
+  segWaarden.locatie = el.dataset.loc;
+  document.querySelectorAll('#seg-locatie .seg-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.val===el.dataset.loc); });
+}
+
+function segKies(type, el) {
+  document.querySelectorAll('#seg-' + type + ' .seg-btn').forEach(function(b){ b.classList.remove('active'); });
+  el.classList.add('active');
+  segWaarden[type] = el.dataset.val;
+}
+
+function slaanOp() {
+  var naam = document.getElementById('f-naam').value.trim();
+  if(!naam) { alert('Vul een naam in'); return; }
+  var prod = {
+    id: bewerkId || ('p' + Date.now()),
+    naam: naam,
+    icon: document.getElementById('f-icon').value.trim() || '📦',
+    locatie: segWaarden.locatie,
+    categorie: document.getElementById('f-categorie').value.trim() || 'Overig',
+    status: segWaarden.status,
+    aantal: document.getElementById('f-aantal').value.trim(),
+    datum: document.getElementById('f-datum').value,
+  };
+  if(bewerkId) { var i = producten.findIndex(function(p){return p.id===bewerkId;}); producten[i] = prod; }
+  else producten.push(prod);
+  slaMetSync(); render(); sluitOverlay('overlay-toevoegen');
+}
+
+function verwijder() {
+  if(!bewerkId) return;
+  producten = producten.filter(function(p){ return p.id !== bewerkId; });
+  slaMetSync(); render(); sluitOverlay('overlay-toevoegen');
+}
+
+// ============ RECEPTEN ============
+function openRecept() {
+  document.getElementById('recept-list').innerHTML = RECEPTEN.map(function(r){
+    var ontbreekt = r.ing.filter(function(ing){
+      return !producten.some(function(p){ return p.naam.toLowerCase().indexOf(ing.toLowerCase()) !== -1 && p.status !== 'op'; });
+    });
+    var status = ontbreekt.length
+      ? '<div class="recept-warn">⚠️ Niet aanwezig: ' + ontbreekt.join(', ') + '</div>'
+      : '<div class="recept-ok">✓ Alles aanwezig</div>';
+    return '<div class="recept-item" onclick="gebruikRecept(\'' + r.naam.replace(/'/g,"\\'") + '\')">' +
+      '<div class="recept-naam">' + r.naam + '</div>' +
+      '<div class="recept-ing">' + r.ing.join(' · ') + '</div>' + status + '</div>';
+  }).join('');
+  document.getElementById('overlay-recept').classList.add('open');
+}
+
+function gebruikRecept(naam) {
+  var r = RECEPTEN.find(function(x){ return x.naam===naam; });
+  if(!r) return;
+  var verbruikt = [];
+  r.ing.forEach(function(ing) {
+    producten.forEach(function(p) {
+      if(p.naam.toLowerCase().indexOf(ing.toLowerCase()) !== -1) {
+        if(p.status==='vol') { p.status='half'; verbruikt.push(p.naam); }
+        else if(p.status==='half') { p.status='bijna'; verbruikt.push(p.naam); }
+        else if(p.status==='bijna') { p.status='op'; verbruikt.push(p.naam); }
+      }
+    });
+  });
+  slaMetSync(); render(); sluitOverlay('overlay-recept');
+  alert('Recept verwerkt! Aangepast: ' + verbruikt.join(', '));
+}
+
+// ============ BOODSCHAPPEN ============
+function toggleGekocht(id) {
+  var i = boodschappenGekocht.indexOf(id);
+  if(i===-1) boodschappenGekocht.push(id); else boodschappenGekocht.splice(i,1);
+  slaBoodschappen(); renderBoodschappen();
+}
+function wisBoodschappenLijst() {
+  boodschappenGekocht.forEach(function(id){ var p=producten.find(function(x){return x.id===id;}); if(p) p.status='vol'; });
+  boodschappenGekocht=[];
+  slaMetSync(); slaBoodschappen(); render();
+}
+
+// ============ CLAUDE CHAT ============
+var SNELVRAGEN = ['Hoeveel melk heb ik nog?','Wat is bijna op?','Wat is verlopen?','Kan ik pasta bolognese maken?','Geef me een boodschappenlijst','Wat kan ik koken vanavond?'];
+
+function wisChat() {
+  if(confirm('Chatgeschiedenis wissen? Vast geheugen blijft bewaard.')) {
+    chatGeschiedenis = []; localStorage.removeItem('chatGeschiedenis'); renderClaudePanel();
+  }
+}
+function openPinnen() {
+  var t = prompt('Wat wil je vastpinnen?');
+  if(t&&t.trim()) { vastGeheugen.push(t.trim()); localStorage.setItem('vastGeheugen', JSON.stringify(vastGeheugen)); clearTimeout(syncTimer); syncTimer = setTimeout(slaanInCloud, 1500); renderClaudePanel(); }
+}
+function verwijderPin(i) {
+  vastGeheugen.splice(i,1); localStorage.setItem('vastGeheugen', JSON.stringify(vastGeheugen)); clearTimeout(syncTimer); syncTimer = setTimeout(slaanInCloud, 1500); renderClaudePanel();
+}
+function pinVanuitChat(tekst) {
+  vastGeheugen.push(tekst); localStorage.setItem('vastGeheugen', JSON.stringify(vastGeheugen)); renderClaudePanel();
+}
+
+function renderClaudePanel() {
+  var panel = document.getElementById('panel-claude');
+  var html = '<div class="chat-wrap">';
+  html += '<div class="geheugen-blok">';
+  html += '<div class="geheugen-titel"><span>📌 Vast geheugen (' + vastGeheugen.length + ')</span><button class="pin-btn" onclick="openPinnen()">+ Vastpinnen</button></div>';
+  if(vastGeheugen.length===0) {
+    html += '<div class="geheugen-leeg">Nog niets vastgepind. Pin voorkeuren die Claude nooit mag vergeten.</div>';
+  } else {
+    vastGeheugen.forEach(function(item,i){
+      html += '<div class="geheugen-item"><span style="font-size:14px">📌</span><span class="geheugen-tekst">'+item+'</span><button class="geheugen-del" onclick="verwijderPin('+i+')">✕</button></div>';
+    });
+  }
+  html += '</div>';
+  html += '<div class="snelvraag-wrap">';
+  SNELVRAGEN.forEach(function(v){ html += '<div class="snelvraag" onclick="stuurSnelvraag(this.textContent)">'+v+'</div>'; });
+  html += '</div>';
+  html += '<div class="chat-msgs" id="chat-msgs">';
+  if(chatGeschiedenis.length===0) {
+    html += '<div class="chat-welkom">🤖 <strong>Claude kent je volledige voorraad en al je menu-voorkeuren.</strong> Stel een vraag!</div>';
+  } else {
+    html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">';
+    html += '<span style="font-size:11px;color:var(--muted);font-weight:700">'+chatGeschiedenis.length+' berichten onthouden</span>';
+    html += '<button onclick="wisChat()" style="background:transparent;border:1px solid var(--c-danger);border-radius:99px;padding:3px 10px;font-size:11px;font-weight:800;color:var(--c-danger);cursor:pointer;font-family:Nunito,sans-serif">🗑 Wis chat</button>';
+    html += '</div>';
+    chatGeschiedenis.forEach(function(m){ html += renderMsg(m.role, m.content); });
+  }
+  html += '</div>';
+  html += '<div class="chat-input-wrap">';
+  html += '<textarea class="chat-input" id="chat-input" placeholder="Stel een vraag..." rows="1" onkeydown="chatKeydown(event)"></textarea>';
+  html += '<button class="chat-send" id="chat-send" onclick="stuurChat()">↑</button>';
+  html += '</div></div>';
+  panel.innerHTML = html;
+  scrollChat();
+}
+
+function renderMsg(role, content) {
+  var pinKnop = '';
+  if(role==='claude') {
+    var veilig = content.replace(/'/g,"\\'").replace(/"/g,'&quot;').substring(0,200);
+    pinKnop = '<button class="pin-chat-btn" onclick="pinVanuitChat(\''+veilig+'\')">📌 Vastpinnen</button>';
+  }
+  return '<div class="msg '+role+'"><div class="msg-label">'+(role==='user'?'Jij':'Claude')+'</div><div class="msg-bubble">'+content.split('\n').join('<br>')+'</div>'+pinKnop+'</div>';
+}
+
+function scrollChat() { var el=document.getElementById('chat-msgs'); if(el) el.scrollTop=el.scrollHeight; }
+function stuurSnelvraag(t) { var inp=document.getElementById('chat-input'); if(inp) inp.value=t; stuurChat(); }
+function chatKeydown(e) { if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); stuurChat(); } }
+
+function bouwVoorraadContext() {
+  if(producten.length===0) return 'De voorraad is leeg.';
+  var regels=['Huidige voorraad:'];
+  ['koelkast','vriezer','droog'].forEach(function(loc){
+    var items=producten.filter(function(p){return p.locatie===loc;});
+    if(!items.length) return;
+    regels.push('\n'+{koelkast:'KOELKAST',vriezer:'VRIEZER',droog:'DROGE VOORRAAD'}[loc]+':');
+    items.forEach(function(p){
+      var r='- '+p.naam+' ('+{vol:'vol',half:'half vol',bijna:'bijna op',op:'op'}[p.status]+')';
+      if(p.aantal) r+=', '+p.aantal;
+      if(p.datum){ var d=Math.round((new Date(p.datum)-new Date())/86400000); r+=d<0?', VERLOPEN '+Math.abs(d)+' dagen geleden':', houdbaar nog '+d+' dagen'; }
+      regels.push(r);
+    });
+  });
+  return regels.join('\n');
+}
+
+async function stuurChat() {
+  if(chatBezig) return;
+  var input=document.getElementById('chat-input');
+  var vraag=input?input.value.trim():'';
+  if(!vraag) return;
+  chatBezig=true; input.value='';
+  document.getElementById('chat-send').disabled=true;
+  chatGeschiedenis.push({role:'user',content:vraag});
+  localStorage.setItem('chatGeschiedenis',JSON.stringify(chatGeschiedenis));
+  var msgsEl=document.getElementById('chat-msgs');
+  msgsEl.innerHTML+=renderMsg('user',vraag);
+  msgsEl.innerHTML+='<div class="msg claude" id="typing-indicator"><div class="msg-label">Claude</div><div class="typing"><span></span><span></span><span></span></div></div>';
+  scrollChat();
+  var voorraad=bouwVoorraadContext();
+  var systeem=[
+    'Je bent een persoonlijke keuken- en menuassistent voor Steven. Je spreekt altijd Nederlands. Je antwoorden zijn kort en praktisch.',
+    '','=== OVER STEVEN ===',
+    'Steven woont in Schijndel en werkt bij Bouwbureau Brok B.V. Hij werkt tot 17:30 en is dan meteen thuis.',
+    'Hij kookt elke ochtend voor 07:30-07:45 zodat de slowcooker overdag werkt.',
+    'Hij heeft 4 kinderen (basisschoolleeftijd, 7-12 jaar) in co-ouderschap (50/50).',
+    '','=== KOOKMETHODEN ===',
+    '- Slowcooker (3,5L Crock-Pot): instelling LOW 9,5 uur (07:45 start = 17:15 klaar)',
+    '- Rijstkoker met timer: timer instellen op 17:00 start (klaar om 17:30)',
+    '- Pasta: slowcooker doet de saus/vlees, pasta 10 min koken als hij thuiskomt',
+    '','=== STEVEN ZIJN VOORKEUREN ===',
+    'Lekker: aardappels, rijst, vlees (rund/varken/kip/gehakt), gevarieerde groente',
+    'Niet lekker: tomatensaus, soepen, zoete aardappel, vis',
+    'Groente die hij lekker vindt: prei, broccoli, courgette, wortel, doperwten, bloemkool, snijbonen, sperziebonen',
+    'Geen losse paprika of champignons als enige groente',
+    '','=== VLEES SYSTEEM ===',
+    '- Vers vlees voor dag 1 en 2 na boodschappen',
+    '- Rest direct invriezen in zakjes van 200g (solo) of 600g (met kids)',
+    '- Avond ervoor zakje uit vriezer in koelkast leggen om te ontdooien',
+    '- Diepvries groente: alleen doperwten, snijbonen, sperziebonen, broccoli, rodekool met appel, spinazie a la creme',
+    '','=== BOODSCHAPPEN ===',
+    '- Maandag en donderdag boodschappen doen',
+    '- Maandag: vers vlees voor ma+di, rest invriezen voor hele week',
+    '- Donderdag: vers vlees voor do+vr, rest invriezen voor za+zo',
+    '','=== KIDS SCHEMA ===',
+    'Week 1: kids bij papa op do, vr, za, zo (4 dagen voor 5 personen)',
+    'Week 2: kids bij papa op do, vr + wo avond (2-3 dagen voor 5 personen)',
+    'Kids houden van: pasta bolognese, pasta met kip, pasta met rul gehakt',
+    'Fun dag (1x per week op vr/za/zo): kids kiezen uit pizza, friet, pannekoeken, chinees afhaal, knakworstjes, McDonalds',
+    'Koken voor 5 personen als kids er zijn (steven + 4 kids)',
+    '','=== RECEPTEN IN GEBRUIK ===',
+    'AARDAPPELGERECHTEN: Stoofvlees met aardappels+prei, Kippendijen met aardappels+courgette+wortel, Gehaktballen met aardappels+sperziebonen, Varkensschouder met aardappels+snijbonen+broccoli',
+    'RIJSTGERECHTEN: Kip teriyaki+rijst+doperwten, Gehaktballen+rijst+prei, Varkensvlees+rijst+broccoli, Stoofvlees+rijst+snijbonen',
+    'PASTA (voor 5 pers): Spaghetti bolognese, Pasta met kip+wortel, Pasta met rul gehakt+doperwten',
+    '','=== ACTUELE VOORRAAD ===',
+    voorraad,
+    vastGeheugen.length>0?('\n=== VASTGEPIND GEHEUGEN ===\n'+vastGeheugen.map(function(v,i){return (i+1)+'. '+v;}).join('\n')):''
+  ].join('\n');
+  var berichten=chatGeschiedenis.slice(-30).map(function(m){return {role:m.role==='user'?'user':'assistant',content:m.content};});
+  try {
+    var resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:systeem,messages:berichten})
+    });
+    var data=await resp.json();
+    var antwoord=data.content&&data.content[0]?data.content[0].text:'Er ging iets mis.';
+    chatGeschiedenis.push({role:'claude',content:antwoord});
+    localStorage.setItem('chatGeschiedenis',JSON.stringify(chatGeschiedenis));
+    var typing=document.getElementById('typing-indicator');
+    if(typing) typing.outerHTML=renderMsg('claude',antwoord);
+    scrollChat();
+  } catch(e) {
+    var typing=document.getElementById('typing-indicator');
+    if(typing) typing.outerHTML=renderMsg('claude','Verbindingsfout. Controleer je internet.');
+  }
+  chatBezig=false;
+  var sb=document.getElementById('chat-send'); if(sb) sb.disabled=false;
+  var inp=document.getElementById('chat-input'); if(inp) inp.focus();
+}
+
+
+// ============ SUPABASE SYNC ============
+var SUPA_URL = 'https://thhxnruxdrdfhemgxxzk.supabase.co';
+var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRoaHhucnV4ZHJkZmhlbWd4eHprIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwNjE2MzcsImV4cCI6MjA5MTYzNzYzN30.NXpsyWiM3swtgF1Nh4DY2ZlcGDEVFb6T77YgpeyHsDE';
+var SUPA_TABLE = 'voorraad';
+var syncTimer = null;
+var syncBezig = false;
+
+function syncStatus(status, tekst) {
+  var dot = document.getElementById('sync-dot');
+  var txt = document.getElementById('sync-tekst');
+  if(!dot || !txt) return;
+  dot.className = 'sync-dot' + (status === 'bezig' ? ' bezig' : status === 'fout' ? ' fout' : '');
+  txt.textContent = tekst;
+}
+
+async function supaFetch(method, body) {
+  var url = SUPA_URL + '/rest/v1/' + SUPA_TABLE;
+  var opts = {
+    method: method,
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': SUPA_KEY,
+      'Authorization': 'Bearer ' + SUPA_KEY,
+      'Prefer': method === 'POST' ? 'resolution=merge-duplicates' : ''
+    }
+  };
+  if(body) opts.body = JSON.stringify(body);
+  return fetch(url, opts);
+}
+
+async function laadVanCloud() {
+  try {
+    syncStatus('bezig', 'Laden...');
+    var resp = await fetch(SUPA_URL + '/rest/v1/' + SUPA_TABLE + '?select=*', {
+      headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY }
+    });
+    var rows = await resp.json();
+    if(!Array.isArray(rows) || rows.length === 0) {
+      // Geen data in cloud — upload lokale data
+      await slaanInCloud();
+      syncStatus('ok', 'Gesynchroniseerd');
+      return;
+    }
+    // Haal data op
+    var row = rows[0];
+    var cloud = row.data || {};
+    if(cloud.producten) { producten = cloud.producten; localStorage.setItem('voorraad', JSON.stringify(producten)); }
+    if(cloud.vastGeheugen) { vastGeheugen = cloud.vastGeheugen; localStorage.setItem('vastGeheugen', JSON.stringify(vastGeheugen)); }
+    if(cloud.chatGeschiedenis) { chatGeschiedenis = cloud.chatGeschiedenis; localStorage.setItem('chatGeschiedenis', JSON.stringify(chatGeschiedenis)); }
+    if(cloud.boodschappenGekocht) { boodschappenGekocht = cloud.boodschappenGekocht; localStorage.setItem('boodschappenGekocht', JSON.stringify(boodschappenGekocht)); }
+    render();
+    syncStatus('ok', 'Gesynchroniseerd ' + tijdNu());
+  } catch(e) {
+    syncStatus('fout', 'Laden mislukt');
+  }
+}
+
+async function slaanInCloud() {
+  if(syncBezig) return;
+  syncBezig = true;
+  syncStatus('bezig', 'Opslaan...');
+  try {
+    var payload = {
+      id: 'steven',
+      data: {
+        producten: producten,
+        vastGeheugen: vastGeheugen,
+        chatGeschiedenis: chatGeschiedenis.slice(-50),
+        boodschappenGekocht: boodschappenGekocht
+      },
+      updated_at: new Date().toISOString()
+    };
+    var resp = await supaFetch('POST', payload);
+    if(resp.ok || resp.status === 201 || resp.status === 200) {
+      syncStatus('ok', 'Opgeslagen ' + tijdNu());
+    } else {
+      syncStatus('fout', 'Opslaan mislukt');
+    }
+  } catch(e) {
+    syncStatus('fout', 'Geen verbinding');
+  }
+  syncBezig = false;
+}
+
+function slaMetSync() {
+  sla();
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(slaanInCloud, 1500);
+}
+
+function tijdNu() {
+  var d = new Date();
+  return d.getHours() + ':' + String(d.getMinutes()).padStart(2,'0');
+}
+
+
+// ============ AUTO UPDATE ============
+var HUIDIGE_VERSIE = '1.0';
+var nieuweHtml = null;
+
+async function checkUpdate() {
+  try {
+    var resp = await fetch(SUPA_URL + '/rest/v1/app_versie?id=eq.voorraad&select=versie,html', {
+      headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY }
+    });
+    var rows = await resp.json();
+    if(!Array.isArray(rows) || rows.length === 0) return;
+    var row = rows[0];
+    if(row.versie && row.versie !== HUIDIGE_VERSIE && row.html) {
+      nieuweHtml = row.html;
+      document.getElementById('update-banner').classList.add('zichtbaar');
+    }
+  } catch(e) { /* stil falen */ }
+}
+
+function voerUpdateUit() {
+  if(!nieuweHtml) return;
+  // Sla huidige data op voor na de update
+  var data = {
+    producten: producten,
+    vastGeheugen: vastGeheugen,
+    chatGeschiedenis: chatGeschiedenis,
+    boodschappenGekocht: boodschappenGekocht
+  };
+  localStorage.setItem('voorraad_backup', JSON.stringify(data));
+  // Vervang de pagina met nieuwe HTML
+  document.open();
+  document.write(nieuweHtml);
+  document.close();
+}
+
+// ============ HELPERS ============
+function sluitOverlay(id) { document.getElementById(id).classList.remove('open'); }
+function locIcon(loc) { return {koelkast:'🧊',vriezer:'❄️',droog:'🥫'}[loc]||'📦'; }
+function locNaam(loc) { return {koelkast:'Koelkast',vriezer:'Vriezer',droog:'Droge voorraad'}[loc]||loc; }
+function dagenTot(datum) {
+  var d=new Date(datum); d.setHours(0,0,0,0);
+  var nu=new Date(); nu.setHours(0,0,0,0);
+  return Math.round((d-nu)/86400000);
+}
+function formatDatum(datum) {
+  var d=new Date(datum);
+  return d.getDate()+'-'+(d.getMonth()+1)+'-'+d.getFullYear();
+}
+document.querySelectorAll('.overlay').forEach(function(ov){
+  ov.addEventListener('click',function(e){ if(e.target===ov) ov.classList.remove('open'); });
+});
+
+laadVanCloud();
+checkUpdate();
+</script>
+</body>
+</html>
