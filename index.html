@@ -389,17 +389,41 @@ var SNELLIJST = [
 ];
 
 var RECEPTEN = [
-  {naam:'Stoofvlees met aardappels en prei', ing:['Stoofvlees','Aardappels','Wortel','Prei','Uien']},
-  {naam:'Kippendijen met aardappels en courgette', ing:['Kippendijen','Aardappels','Courgette','Wortel','Uien']},
-  {naam:'Gehaktballen met aardappels en sperziebonen', ing:['Gehakt','Aardappels','Sperziebonen','Uien']},
-  {naam:'Varkensschouder met aardappels en snijbonen', ing:['Varkensschouder','Aardappels','Snijbonen','Broccoli','Uien']},
-  {naam:'Kip teriyaki met rijst en doperwten', ing:['Kippendijen','Rijst','Doperwten','Uien']},
-  {naam:'Gehaktballen met rijst en prei', ing:['Gehakt','Rijst','Prei','Uien']},
-  {naam:'Varkensvlees met rijst en broccoli', ing:['Varkensschouder','Rijst','Broccoli','Uien']},
-  {naam:'Stoofvlees met rijst en snijbonen', ing:['Stoofvlees','Rijst','Snijbonen','Wortel','Uien']},
-  {naam:'Spaghetti bolognese', ing:['Gehakt','Spaghetti','Uien','Tomatenblokjes']},
-  {naam:'Pasta met kip en wortel', ing:['Kippendijen','Penne','Wortel','Uien']},
-  {naam:'Pasta met rul gehakt', ing:['Gehakt','Penne','Uien','Doperwten']},
+  // SLOWCOOKER AARDAPPEL
+  {naam:'Stoofvlees met aardappels en prei', type:'slowcooker', ing:['Stoofvlees','Aardappels','Wortel','Prei','Uien']},
+  {naam:'Kippendijen met aardappels en courgette', type:'slowcooker', ing:['Kippendijen','Aardappels','Courgette','Wortel','Uien']},
+  {naam:'Gehaktballen met aardappels en sperziebonen', type:'slowcooker', ing:['Gehakt','Aardappels','Sperziebonen','Uien']},
+  {naam:'Varkensschouder met aardappels en snijbonen', type:'slowcooker', ing:['Varkensschouder','Aardappels','Snijbonen','Broccoli','Uien']},
+  {naam:'Kippendijen met aardappels en bloemkool', type:'slowcooker', ing:['Kippendijen','Aardappels','Bloemkool','Uien']},
+  {naam:'Gehakt met aardappels en wortel', type:'slowcooker', ing:['Gehakt','Aardappels','Wortel','Uien']},
+  {naam:'Stoofvlees met aardappels en snijbonen', type:'slowcooker', ing:['Stoofvlees','Aardappels','Snijbonen','Uien']},
+  {naam:'Varkensschouder met aardappels en prei', type:'slowcooker', ing:['Varkensschouder','Aardappels','Prei','Wortel','Uien']},
+  {naam:'Kippendijen met aardappels en broccoli', type:'slowcooker', ing:['Kippendijen','Aardappels','Broccoli','Uien']},
+  {naam:'Stoofvlees met aardappels en bloemkool', type:'slowcooker', ing:['Stoofvlees','Aardappels','Bloemkool','Wortel','Uien']},
+  {naam:'Gehaktballen met aardappels en doperwten', type:'slowcooker', ing:['Gehakt','Aardappels','Doperwten','Uien']},
+  {naam:'Varkensschouder met aardappels en courgette', type:'slowcooker', ing:['Varkensschouder','Aardappels','Courgette','Uien']},
+  // SLOWCOOKER RIJST
+  {naam:'Kip teriyaki met rijst en doperwten', type:'slowcooker', ing:['Kippendijen','Rijst','Doperwten','Uien']},
+  {naam:'Gehaktballen met rijst en prei', type:'slowcooker', ing:['Gehakt','Rijst','Prei','Uien']},
+  {naam:'Varkensvlees met rijst en broccoli', type:'slowcooker', ing:['Varkensschouder','Rijst','Broccoli','Uien']},
+  {naam:'Stoofvlees met rijst en snijbonen', type:'slowcooker', ing:['Stoofvlees','Rijst','Snijbonen','Wortel','Uien']},
+  {naam:'Kippendijen met rijst en bloemkool', type:'slowcooker', ing:['Kippendijen','Rijst','Bloemkool','Uien']},
+  {naam:'Gehakt met rijst en courgette', type:'slowcooker', ing:['Gehakt','Rijst','Courgette','Uien']},
+  {naam:'Varkensschouder met rijst en sperziebonen', type:'slowcooker', ing:['Varkensschouder','Rijst','Sperziebonen','Uien']},
+  {naam:'Stoofvlees met rijst en doperwten', type:'slowcooker', ing:['Stoofvlees','Rijst','Doperwten','Wortel','Uien']},
+  {naam:'Kippendijen met rijst en snijbonen', type:'slowcooker', ing:['Kippendijen','Rijst','Snijbonen','Uien']},
+  {naam:'Gehaktballen met rijst en wortel', type:'slowcooker', ing:['Gehakt','Rijst','Wortel','Uien']},
+  // PASTA (voor 5 personen)
+  {naam:'Spaghetti bolognese', type:'pasta', ing:['Gehakt','Spaghetti','Uien','Tomatenblokjes']},
+  {naam:'Pasta met kip en wortel', type:'pasta', ing:['Kippendijen','Penne','Wortel','Uien']},
+  {naam:'Pasta met rul gehakt en doperwten', type:'pasta', ing:['Gehakt','Penne','Doperwten','Uien']},
+  {naam:'Pasta met kip en prei', type:'pasta', ing:['Kippendijen','Penne','Prei','Uien']},
+  {naam:'Spaghetti met gehaktballen', type:'pasta', ing:['Gehakt','Spaghetti','Uien','Tomatenblokjes']},
+  {naam:'Pasta met varkensvlees en courgette', type:'pasta', ing:['Varkensschouder','Penne','Courgette','Uien']},
+  {naam:'Farfalle met kip en broccoli', type:'pasta', ing:['Kippendijen','Farfalle','Broccoli','Uien']},
+  {naam:'Pasta met gehakt en snijbonen', type:'pasta', ing:['Gehakt','Penne','Snijbonen','Uien']},
+  {naam:'Farfalle met kippendijen en wortel', type:'pasta', ing:['Kippendijen','Farfalle','Wortel','Prei','Uien']},
+  {naam:'Spaghetti met varkensvlees', type:'pasta', ing:['Varkensschouder','Spaghetti','Uien','Tomatenblokjes']},
 ];
 
 var producten = JSON.parse(localStorage.getItem('voorraad') || '[]');
