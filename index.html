@@ -315,7 +315,8 @@ html, body { height: 100%; width: 100%; background: var(--bg); font-family: 'Nun
     <div class="form-row">
       <div>
         <label class="form-label">Aantal / gewicht</label>
-        <input class="form-input" id="f-aantal" type="text" placeholder="3 of 500g">
+        <div id="f-type-hint" style="display:none;font-size:11px;font-weight:700;margin-bottom:6px;padding:6px 10px;border-radius:8px;background:#F3F4F6"></div>
+        <input class="form-input" id="f-aantal" type="text" placeholder="bijv. 3 (stuks) of 500ml">
       </div>
       <div>
         <label class="form-label">Houdbaar tot</label>
@@ -342,50 +343,66 @@ html, body { height: 100%; width: 100%; background: var(--bg); font-family: 'Nun
 <script>
 // ============ DATA ============
 var SNELLIJST = [
-  {naam:'Melk',icon:'🥛',loc:'koelkast',cat:'Zuivel'},
-  {naam:'Eieren',icon:'🥚',loc:'koelkast',cat:'Zuivel'},
-  {naam:'Boter',icon:'🧈',loc:'koelkast',cat:'Zuivel'},
-  {naam:'Kaas',icon:'🧀',loc:'koelkast',cat:'Zuivel'},
-  {naam:'Yoghurt',icon:'🍶',loc:'koelkast',cat:'Zuivel'},
-  {naam:'Gehakt',icon:'🥩',loc:'koelkast',cat:'Vlees'},
-  {naam:'Kipfilet',icon:'🍗',loc:'koelkast',cat:'Vlees'},
-  {naam:'Kippendijen',icon:'🍗',loc:'koelkast',cat:'Vlees'},
-  {naam:'Stoofvlees',icon:'🥩',loc:'koelkast',cat:'Vlees'},
-  {naam:'Varkensschouder',icon:'🥩',loc:'koelkast',cat:'Vlees'},
-  {naam:'Aardappels',icon:'🥔',loc:'koelkast',cat:'Groente'},
-  {naam:'Wortel',icon:'🥕',loc:'koelkast',cat:'Groente'},
-  {naam:'Prei',icon:'🌿',loc:'koelkast',cat:'Groente'},
-  {naam:'Courgette',icon:'🥒',loc:'koelkast',cat:'Groente'},
-  {naam:'Broccoli',icon:'🥦',loc:'koelkast',cat:'Groente'},
-  {naam:'Uien',icon:'🧅',loc:'koelkast',cat:'Groente'},
-  {naam:'Gehakt (vries)',icon:'🥩',loc:'vriezer',cat:'Vlees'},
-  {naam:'Kippendijen (vries)',icon:'🍗',loc:'vriezer',cat:'Vlees'},
-  {naam:'Stoofvlees (vries)',icon:'🥩',loc:'vriezer',cat:'Vlees'},
-  {naam:'Varkensvlees (vries)',icon:'🥩',loc:'vriezer',cat:'Vlees'},
-  {naam:'Doperwten',icon:'🟢',loc:'vriezer',cat:'Groente'},
-  {naam:'Sperziebonen',icon:'🟢',loc:'vriezer',cat:'Groente'},
-  {naam:'Snijbonen',icon:'🟢',loc:'vriezer',cat:'Groente'},
-  {naam:'Broccoli (vries)',icon:'🥦',loc:'vriezer',cat:'Groente'},
-  {naam:'Spinazie a la creme',icon:'🌿',loc:'vriezer',cat:'Groente'},
-  {naam:'Rodekool met appel',icon:'🍎',loc:'vriezer',cat:'Groente'},
-  {naam:'Spaghetti',icon:'🍝',loc:'droog',cat:'Pasta & Rijst'},
-  {naam:'Penne',icon:'🍝',loc:'droog',cat:'Pasta & Rijst'},
-  {naam:'Farfalle',icon:'🍝',loc:'droog',cat:'Pasta & Rijst'},
-  {naam:'Rijst',icon:'🍚',loc:'droog',cat:'Pasta & Rijst'},
-  {naam:'Runderbouillon',icon:'🟫',loc:'droog',cat:'Blikken & Houdbaar'},
-  {naam:'Kippenbouillon',icon:'🟡',loc:'droog',cat:'Blikken & Houdbaar'},
-  {naam:'Tomatenblokjes',icon:'🍅',loc:'droog',cat:'Blikken & Houdbaar'},
-  {naam:'Geraspte kaas',icon:'🧀',loc:'droog',cat:'Blikken & Houdbaar'},
-  {naam:'Sojasaus',icon:'🫙',loc:'droog',cat:'Sauzen & Kruiden'},
-  {naam:'Honing',icon:'🍯',loc:'droog',cat:'Sauzen & Kruiden'},
-  {naam:'Mosterd',icon:'🟡',loc:'droog',cat:'Sauzen & Kruiden'},
-  {naam:'Knoflookpoeder',icon:'🧄',loc:'droog',cat:'Sauzen & Kruiden'},
-  {naam:'Paprikapoeder',icon:'🌶️',loc:'droog',cat:'Sauzen & Kruiden'},
-  {naam:'Tijm',icon:'🌿',loc:'droog',cat:'Sauzen & Kruiden'},
-  {naam:'Italiaanse kruiden',icon:'🌿',loc:'droog',cat:'Sauzen & Kruiden'},
-  {naam:'Zout',icon:'🧂',loc:'droog',cat:'Sauzen & Kruiden'},
-  {naam:'Peper',icon:'⚫',loc:'droog',cat:'Sauzen & Kruiden'},
-  {naam:'Olijfolie',icon:'🫙',loc:'droog',cat:'Sauzen & Kruiden'},
+  {naam:'Melk',icon:'🥛',loc:'koelkast',cat:'Zuivel',type:'pak',min:2},
+  {naam:'Eieren',icon:'🥚',loc:'koelkast',cat:'Zuivel',type:'stuk',min:6},
+  {naam:'Boter',icon:'🧈',loc:'koelkast',cat:'Zuivel',type:'pak',min:1},
+  {naam:'Kaas',icon:'🧀',loc:'koelkast',cat:'Zuivel',type:'pak',min:1},
+  {naam:'Yoghurt',icon:'🍶',loc:'koelkast',cat:'Zuivel',type:'pak',min:2},
+  {naam:'Nutella',icon:'🍫',loc:'koelkast',cat:'Brood & Beleg',type:'pot',min:1},
+  {naam:'Hagelslag',icon:'🍫',loc:'droog',cat:'Blikken & Houdbaar',type:'pak',min:1},
+  {naam:'Pindakaas',icon:'🥜',loc:'droog',cat:'Blikken & Houdbaar',type:'pot',min:1},
+  {naam:'Jam',icon:'🍓',loc:'koelkast',cat:'Brood & Beleg',type:'pot',min:1},
+  {naam:'Smeerkaas',icon:'🧀',loc:'koelkast',cat:'Brood & Beleg',type:'pak',min:1},
+  {naam:'Brood',icon:'🍞',loc:'koelkast',cat:'Brood & Beleg',type:'stuk',min:1},
+  {naam:'Vleeswaren',icon:'🥩',loc:'koelkast',cat:'Brood & Beleg',type:'pak',min:1},
+  {naam:'Gehakt',icon:'🥩',loc:'koelkast',cat:'Vlees',type:'pak',min:0},
+  {naam:'Kipfilet',icon:'🍗',loc:'koelkast',cat:'Vlees',type:'pak',min:0},
+  {naam:'Kippendijen',icon:'🍗',loc:'koelkast',cat:'Vlees',type:'pak',min:0},
+  {naam:'Stoofvlees',icon:'🥩',loc:'koelkast',cat:'Vlees',type:'pak',min:0},
+  {naam:'Varkensschouder',icon:'🥩',loc:'koelkast',cat:'Vlees',type:'pak',min:0},
+  {naam:'Knakworstjes',icon:'🌭',loc:'koelkast',cat:'Vlees',type:'pak',min:1},
+  {naam:'Aardappels',icon:'🥔',loc:'koelkast',cat:'Groente',type:'stuk',min:4},
+  {naam:'Wortel',icon:'🥕',loc:'koelkast',cat:'Groente',type:'stuk',min:2},
+  {naam:'Prei',icon:'🌿',loc:'koelkast',cat:'Groente',type:'stuk',min:1},
+  {naam:'Courgette',icon:'🥒',loc:'koelkast',cat:'Groente',type:'stuk',min:0},
+  {naam:'Broccoli',icon:'🥦',loc:'koelkast',cat:'Groente',type:'stuk',min:0},
+  {naam:'Uien',icon:'🧅',loc:'koelkast',cat:'Groente',type:'stuk',min:3},
+  {naam:'Gehakt (vries)',icon:'🥩',loc:'vriezer',cat:'Vlees',type:'pak',min:2},
+  {naam:'Kippendijen (vries)',icon:'🍗',loc:'vriezer',cat:'Vlees',type:'pak',min:2},
+  {naam:'Stoofvlees (vries)',icon:'🥩',loc:'vriezer',cat:'Vlees',type:'pak',min:1},
+  {naam:'Varkensvlees (vries)',icon:'🥩',loc:'vriezer',cat:'Vlees',type:'pak',min:1},
+  {naam:'Doperwten',icon:'🟢',loc:'vriezer',cat:'Groente',type:'pak',min:1},
+  {naam:'Sperziebonen',icon:'🟢',loc:'vriezer',cat:'Groente',type:'pak',min:1},
+  {naam:'Snijbonen',icon:'🟢',loc:'vriezer',cat:'Groente',type:'pak',min:1},
+  {naam:'Broccoli (vries)',icon:'🥦',loc:'vriezer',cat:'Groente',type:'pak',min:1},
+  {naam:'Spinazie a la creme',icon:'🌿',loc:'vriezer',cat:'Groente',type:'pak',min:1},
+  {naam:'Rodekool met appel',icon:'🍎',loc:'vriezer',cat:'Groente',type:'pak',min:1},
+  {naam:'Diepvriesfriet',icon:'🍟',loc:'vriezer',cat:'Snacks',type:'zak',min:1},
+  {naam:'Diepvriespizza',icon:'🍕',loc:'vriezer',cat:'Snacks',type:'stuk',min:2},
+  {naam:'Spaghetti',icon:'🍝',loc:'droog',cat:'Pasta & Rijst',type:'pak',min:1},
+  {naam:'Penne',icon:'🍝',loc:'droog',cat:'Pasta & Rijst',type:'pak',min:1},
+  {naam:'Farfalle',icon:'🍝',loc:'droog',cat:'Pasta & Rijst',type:'pak',min:1},
+  {naam:'Rijst',icon:'🍚',loc:'droog',cat:'Pasta & Rijst',type:'pak',min:1},
+  {naam:'Runderbouillon',icon:'🟫',loc:'droog',cat:'Blikken & Houdbaar',type:'stuk',min:3},
+  {naam:'Kippenbouillon',icon:'🟡',loc:'droog',cat:'Blikken & Houdbaar',type:'stuk',min:3},
+  {naam:'Tomatenblokjes',icon:'🍅',loc:'droog',cat:'Blikken & Houdbaar',type:'blik',min:2},
+  {naam:'Geraspte kaas',icon:'🧀',loc:'droog',cat:'Blikken & Houdbaar',type:'pak',min:1},
+  {naam:'Pannenkoekenmix',icon:'🥞',loc:'droog',cat:'Blikken & Houdbaar',type:'pak',min:1},
+  {naam:'Sojasaus',icon:'🫙',loc:'droog',cat:'Sauzen & Kruiden',type:'fles',min:1},
+  {naam:'Honing',icon:'🍯',loc:'droog',cat:'Sauzen & Kruiden',type:'pot',min:1},
+  {naam:'Mosterd',icon:'🟡',loc:'droog',cat:'Sauzen & Kruiden',type:'pot',min:1},
+  {naam:'Knoflookpoeder',icon:'🧄',loc:'droog',cat:'Sauzen & Kruiden',type:'pot',min:1},
+  {naam:'Paprikapoeder',icon:'🌶️',loc:'droog',cat:'Sauzen & Kruiden',type:'pot',min:1},
+  {naam:'Tijm',icon:'🌿',loc:'droog',cat:'Sauzen & Kruiden',type:'pot',min:1},
+  {naam:'Italiaanse kruiden',icon:'🌿',loc:'droog',cat:'Sauzen & Kruiden',type:'pot',min:1},
+  {naam:'Zout',icon:'🧂',loc:'droog',cat:'Sauzen & Kruiden',type:'pak',min:1},
+  {naam:'Peper',icon:'⚫',loc:'droog',cat:'Sauzen & Kruiden',type:'pot',min:1},
+  {naam:'Olijfolie',icon:'🫙',loc:'droog',cat:'Sauzen & Kruiden',type:'fles',min:1},
+  {naam:'Appelsap',icon:'🍎',loc:'koelkast',cat:'Dranken',type:'pak',min:1},
+  {naam:'Frisdrank',icon:'🥤',loc:'koelkast',cat:'Dranken',type:'fles',min:0},
+  {naam:'Koekjes',icon:'🍪',loc:'droog',cat:'Snacks',type:'pak',min:1},
+  {naam:'Chips',icon:'🥔',loc:'droog',cat:'Snacks',type:'zak',min:0},
+  {naam:'Snoep',icon:'🍬',loc:'droog',cat:'Snacks',type:'zak',min:0},
 ];
 
 var RECEPTEN = [
@@ -503,8 +520,29 @@ function sla() { localStorage.setItem('voorraad', JSON.stringify(producten)); }
 function slaBoodschappen() { localStorage.setItem('boodschappenGekocht', JSON.stringify(boodschappenGekocht)); }
 
 // ============ ALARM LOGICA ============
+function getSnelItem(naam) {
+  return SNELLIJST.find(function(s){ return s.naam.toLowerCase() === naam.toLowerCase(); });
+}
+
+function isStukProduct(p) {
+  var s = getSnelItem(p.naam);
+  return s && s.type === 'stuk';
+}
+
+function getMinimum(p) {
+  var s = getSnelItem(p.naam);
+  return s ? (s.min || 0) : 0;
+}
+
+function getAantalNum(p) {
+  if(!p.aantal) return null;
+  var n = parseFloat(p.aantal);
+  return isNaN(n) ? null : n;
+}
+
 function berekenAlarms() {
-  var alarms = {verlopen:[], kritiek:[], warn:[], bijna:[]};
+  var alarms = {verlopen:[], kritiek:[], warn:[], bijna:[], minimum:[]};
+
   producten.forEach(function(p) {
     var heeftDatumAlarm = false;
     if(p.datum) {
@@ -513,17 +551,49 @@ function berekenAlarms() {
       else if(d <= 2) { alarms.kritiek.push({prod:p, dagen:d}); heeftDatumAlarm = true; }
       else if(d <= 5) { alarms.warn.push({prod:p, dagen:d}); heeftDatumAlarm = true; }
     }
-    if(!heeftDatumAlarm) {
+
+    // Stuk producten: alarm op aantal <= 1
+    if(!heeftDatumAlarm && isStukProduct(p)) {
+      var n = getAantalNum(p);
+      if(n !== null && n <= 1) {
+        alarms.bijna.push({prod:p, reden: n === 0 ? 'Op (0 stuks)' : 'Nog maar 1 stuk'});
+        heeftDatumAlarm = true;
+      }
+    }
+
+    // Pak/hoeveelheid producten: gebruik status
+    if(!heeftDatumAlarm && !isStukProduct(p)) {
       if(p.status === 'op') alarms.bijna.push({prod:p, reden:'Op'});
       else if(p.status === 'bijna') alarms.bijna.push({prod:p, reden:'Bijna op'});
     }
+
+    // Minimum voorraad check
+    var min = getMinimum(p);
+    if(min > 0) {
+      var n = getAantalNum(p);
+      var onderMin = false;
+      if(isStukProduct(p) && n !== null && n < min) onderMin = true;
+      if(!isStukProduct(p) && (p.status === 'op' || p.status === 'bijna')) onderMin = true;
+      if(onderMin && !alarms.minimum.some(function(m){ return m.prod.id === p.id; })) {
+        alarms.minimum.push({prod:p, min:min, huidig: n !== null ? n : p.status});
+      }
+    }
   });
+
+  // Voeg ook minimum-producten toe die NIET in voorraad zitten
+  SNELLIJST.filter(function(s){ return s.min > 0; }).forEach(function(s) {
+    var inVoorraad = producten.some(function(p){ return p.naam.toLowerCase() === s.naam.toLowerCase(); });
+    if(!inVoorraad) {
+      alarms.minimum.push({prod:{naam:s.naam, icon:s.icon, locatie:s.loc, id:'min_'+s.naam, status:'op', aantal:''}, min:s.min, huidig:0, ontbreekt:true});
+    }
+  });
+
   return alarms;
 }
 
 function updateHerinnering() {
   var alarms = berekenAlarms();
-  var totaal = alarms.verlopen.length + alarms.kritiek.length + alarms.warn.length + alarms.bijna.length;
+  var totaal = alarms.verlopen.length + alarms.kritiek.length + alarms.warn.length + alarms.bijna.length + alarms.minimum.length;
   var banner = document.getElementById('herinnering-banner');
   var itemsEl = document.getElementById('herinnering-items');
   var badge = document.getElementById('badge-alarm');
@@ -554,7 +624,7 @@ function updateHerinnering() {
 function renderAlarm() {
   var panel = document.getElementById('panel-alarm');
   var alarms = berekenAlarms();
-  var totaal = alarms.verlopen.length + alarms.kritiek.length + alarms.warn.length + alarms.bijna.length;
+  var totaal = alarms.verlopen.length + alarms.kritiek.length + alarms.warn.length + alarms.bijna.length + alarms.minimum.length;
 
   if(totaal === 0) {
     panel.innerHTML = '<div class="alarm-leeg"><div class="alarm-leeg-icon">✅</div><p>Alles in orde!<br>Geen producten verlopen of bijna op.</p></div>';
@@ -582,6 +652,7 @@ function renderAlarm() {
   html += alarmSectie(alarms.kritiek, 'danger', '🔴 Verloopt snel', 'badge-danger', function(a){ return 'nog ' + a.dagen + ' dag(en)'; });
   html += alarmSectie(alarms.warn, 'warn', '🟡 Let op datum', 'badge-warn', function(a){ return 'nog ' + a.dagen + ' dagen'; });
   html += alarmSectie(alarms.bijna, 'bijna', '🟠 Op of bijna op', 'badge-bijna', function(a){ return a.reden; });
+  html += alarmSectie(alarms.minimum, 'warn', '📦 Onder minimale voorraad', 'badge-warn', function(a){ return 'min. ' + a.min + (a.prod.naam && isStukProduct(a.prod) ? ' stuks' : ''); });
 
   html += '<div style="margin-top:12px;padding:10px 14px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)">';
   html += '<p style="font-size:12px;color:var(--muted);font-weight:600">Tik op een product om de status bij te werken. Bijgewerkte producten verdwijnen automatisch uit de alarmlijst.</p>';
@@ -751,7 +822,7 @@ function bewerk(id) {
 
 function bouwSnellijst() {
   document.getElementById('snel-list').innerHTML = SNELLIJST.map(function(s){
-    return '<div class="snel-item" onclick="vulSnel(this)" data-naam="'+s.naam+'" data-icon="'+s.icon+'" data-loc="'+s.loc+'" data-cat="'+s.cat+'">'+s.icon+'<br>'+s.naam+'</div>';
+    return '<div class="snel-item" onclick="vulSnel(this)" data-naam="'+s.naam+'" data-icon="'+s.icon+'" data-loc="'+s.loc+'" data-cat="'+s.cat+'" data-type="'+(s.type||'pak')+'" data-min="'+(s.min||0)+'">'+s.icon+'<br>'+s.naam+'</div>';
   }).join('');
 }
 
@@ -761,6 +832,21 @@ function vulSnel(el) {
   document.getElementById('f-categorie').value = el.dataset.cat;
   segWaarden.locatie = el.dataset.loc;
   document.querySelectorAll('#seg-locatie .seg-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.val===el.dataset.loc); });
+  // Toon type hint
+  var hint = document.getElementById('f-type-hint');
+  if(hint) {
+    var type = el.dataset.type;
+    var min = el.dataset.min;
+    if(type === 'stuk') {
+      hint.textContent = 'Telbaar product — vul aantal in. Alarm bij 1 of minder.';
+      hint.style.color = '#1565C0';
+    } else {
+      hint.textContent = 'Hoeveelheidsproduct — gebruik status (vol/half/bijna op/op).';
+      hint.style.color = '#6A1B9A';
+    }
+    hint.style.display = 'block';
+    if(parseInt(min) > 0) hint.textContent += ' Minimum: ' + min + ' ' + type + '.';
+  }
 }
 
 function segKies(type, el) {
