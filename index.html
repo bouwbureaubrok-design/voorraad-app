@@ -181,7 +181,7 @@ html, body { height: 100%; width: 100%; background: var(--bg); font-family: 'Nun
 .snel-item:active { background: var(--card3); color: var(--text); }
 
 /* Recept */
-.recept-item { background: var(--card2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 11px 13px; cursor: pointer; margin-bottom: 7px; -webkit-tap-highlight-color: rgba(0,0,0,0.08); user-select: none; -webkit-user-select: none; }
+.recept-item { background: var(--card2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 11px 13px; cursor: pointer; margin-bottom: 7px; font-family: 'Nunito', sans-serif; color: var(--text); appearance: none; -webkit-appearance: none; }
 .recept-item:active { background: var(--card3); }
 .recept-naam { font-size: 13px; font-weight: 800; color: var(--text); }
 .recept-ing { font-size: 11px; color: var(--muted); margin-top: 3px; font-weight: 600; }
@@ -842,9 +842,13 @@ function openRecept() {
     var ontbreekt = r.ing.filter(function(ing) { return !ingInVoorraad(ing); });
 
     // Card opbouwen met DOM
-    var card = document.createElement('div');
+    var card = document.createElement('button');
     card.className = 'recept-item';
     card.style.marginBottom = '7px';
+    card.style.width = '100%';
+    card.style.textAlign = 'left';
+    card.style.display = 'block';
+    card.type = 'button';
 
     // Naam + type badge
     var naamDiv = document.createElement('div');
@@ -883,9 +887,6 @@ function openRecept() {
     card.appendChild(naamDiv);
     card.appendChild(ingDiv);
     card.appendChild(statusDiv);
-    card.dataset.idx = receptIdx;
-    card.style.cursor = 'pointer';
-    card.style.webkitTapHighlightColor = 'rgba(0,0,0,0.1)';
     (function(ridx) {
       card.onclick = function() { verwerkRecept(ridx); };
     })(receptIdx);
