@@ -745,7 +745,15 @@ function openRecept() {
   document.getElementById('overlay-recept').classList.add('open');
 }
 
-function gebruikRecept(naam) {
+function gebruikReceptIdx(idx) {
+  gebruikRecept(RECEPTEN[idx]);
+}
+
+function gebruikRecept(r) {
+  if(typeof r === 'string') {
+    r = RECEPTEN.find(function(x){ return x.naam === r; });
+  }
+  if(!r) return;
   var r = RECEPTEN.find(function(x){ return x.naam===naam; });
   if(!r) return;
   var verbruikt = [];
