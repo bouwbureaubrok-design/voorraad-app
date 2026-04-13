@@ -144,6 +144,20 @@ html, body { height: 100%; width: 100%; background: var(--bg); font-family: 'Nun
 .update-btn { background: #43A047; border: none; border-radius: 99px; padding: 6px 14px; font-family: Nunito,sans-serif; font-size: 12px; font-weight: 800; color: #fff; cursor: pointer; flex-shrink: 0; }
 .update-btn:active { transform: scale(0.96); }
 
+/* Inkoop popup */
+.inkoop-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:200; align-items:center; justify-content:center; padding:20px; }
+.inkoop-overlay.open { display:flex; }
+.inkoop-card { background:var(--card); border-radius:var(--radius); padding:20px; width:100%; max-width:360px; box-shadow:0 8px 32px rgba(0,0,0,0.2); }
+.inkoop-titel { font-size:16px; font-weight:900; color:var(--text); margin-bottom:4px; }
+.inkoop-sub { font-size:12px; color:var(--muted); font-weight:600; margin-bottom:16px; }
+.inkoop-voortgang { font-size:11px; color:var(--muted); font-weight:700; margin-bottom:12px; }
+.inkoop-input { width:100%; background:var(--card2); border:1.5px solid var(--c-purple); border-radius:var(--radius-sm); padding:12px 14px; font-family:Nunito,sans-serif; font-size:18px; font-weight:900; color:var(--text); outline:none; text-align:center; margin-bottom:12px; }
+.inkoop-btns { display:flex; gap:8px; }
+.inkoop-btn { flex:1; padding:11px; border-radius:var(--radius-sm); font-family:Nunito,sans-serif; font-size:13px; font-weight:800; cursor:pointer; border:none; }
+.inkoop-btn-ok { background:var(--text); color:#fff; }
+.inkoop-btn-skip { background:var(--card2); color:var(--muted); border:1px solid var(--border); }
+.inkoop-btn-stop { background:transparent; color:var(--c-danger); border:1px solid var(--c-danger); }
+
 /* Sync indicator */
 .sync-bar { display: flex; align-items: center; gap: 6px; padding: 4px 16px 0; flex-shrink: 0; }
 .sync-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--c-ok); flex-shrink: 0; }
@@ -226,11 +240,27 @@ html, body { height: 100%; width: 100%; background: var(--bg); font-family: 'Nun
 </style>
 </head>
 <body>
+<!-- Inkoop popup -->
+<div class="inkoop-overlay" id="inkoop-overlay">
+  <div class="inkoop-card">
+    <p class="inkoop-voortgang" id="inkoop-voortgang">Product 1 van 3</p>
+    <p class="inkoop-titel" id="inkoop-product-naam">Melk</p>
+    <p class="inkoop-sub" id="inkoop-product-sub">Hoeveelheid in pak</p>
+    <input class="inkoop-input" id="inkoop-input" type="number" min="0" step="1" placeholder="0">
+    <div class="inkoop-btns">
+      <button class="inkoop-btn inkoop-btn-stop" onclick="stopInkoop()">Stop</button>
+      <button class="inkoop-btn inkoop-btn-skip" onclick="slaInkoopOver()">Overslaan</button>
+      <button class="inkoop-btn inkoop-btn-ok" onclick="bevestigInkoop()">OK ✓</button>
+    </div>
+  </div>
+</div>
+
 <div class="app">
   <div class="header">
     <div class="header-top">
       <h1>🏠 Voorraad</h1>
       <div class="header-btns">
+        <button class="hbtn" onclick="ververs()">↻</button>
         <button class="hbtn" onclick="openRecept()">🍽 Recept</button>
         <button class="hbtn" onclick="openToevoegen()">+ Nieuw</button>
       </div>
@@ -762,38 +792,92 @@ function prodCard(p) {
 
 function renderBoodschappen() {
   var panel = document.getElementById('panel-boodschappen');
-  var lijst = producten.filter(function(p){ return p.status==='bijna'||p.status==='op'; });
   var badge = document.getElementById('badge-boodschappen');
+
+  // Bouw boodschappenlijst: status op/bijna + producten onder minimum
+  var lijstIds = {};
+
+  // 1. Producten met status op of bijna
+  producten.forEach(function(p) {
+    if(p.status === 'op' || p.status === 'bijna') {
+      lijstIds[p.id] = {prod:p, prioriteit: p.status === 'op' ? 0 : 1};
+    }
+  });
+
+  // 2. Producten onder minimum die nog niet op de lijst staan
+  producten.forEach(function(p) {
+    if(lijstIds[p.id]) return;
+    var min = getMinimum(p);
+    if(min > 0) {
+      var n = getAantalNum(p);
+      if(isStukProduct(p) && n !== null && n < min) {
+        lijstIds[p.id] = {prod:p, prioriteit:2, tekort: min - n};
+      }
+    }
+  });
+
+  // 3. Producten met minimum die helemaal niet in voorraad zitten
+  SNELLIJST.filter(function(s){ return s.min > 0; }).forEach(function(s) {
+    var inVoorraad = producten.find(function(p){ return p.naam.toLowerCase() === s.naam.toLowerCase(); });
+    if(!inVoorraad) {
+      var fakeId = 'min_' + s.naam;
+      lijstIds[fakeId] = {
+        prod:{id:fakeId, naam:s.naam, icon:s.icon, locatie:s.loc, status:'op', aantal:'', categorie:s.cat},
+        prioriteit:0, ontbreekt:true
+      };
+    }
+  });
+
+  var lijst = Object.values(lijstIds).sort(function(a,b){ return a.prioriteit - b.prioriteit; });
+
   if(lijst.length === 0) {
     badge.style.display = 'none';
     panel.innerHTML = '<div class="leeg"><div class="leeg-icon">✅</div><p>Alles op voorraad!</p></div>';
     return;
   }
-  badge.textContent = lijst.length; badge.style.display = 'inline-block';
-  lijst.sort(function(a,b){ return ({op:0,bijna:1}[a.status]||2)-({op:0,bijna:1}[b.status]||2); });
-  var op = lijst.filter(function(p){return p.status==='op';});
-  var bijna = lijst.filter(function(p){return p.status==='bijna';});
+
+  // Badge telt niet-afgevinkte items
+  var nietGekocht = lijst.filter(function(item){ return boodschappenGekocht.indexOf(item.prod.id) === -1; }).length;
+  badge.textContent = nietGekocht;
+  badge.style.display = nietGekocht > 0 ? 'inline-block' : 'none';
+
+  var op = lijst.filter(function(item){ return item.prioriteit === 0; });
+  var bijna = lijst.filter(function(item){ return item.prioriteit === 1; });
+  var minimum = lijst.filter(function(item){ return item.prioriteit === 2; });
+
   var html = '';
   if(op.length) {
     html += '<div class="cat-header"><div class="cat-lijn"></div><div class="cat-label" style="color:var(--c-danger)">Op — moet gekocht</div><div class="cat-lijn"></div></div>';
-    op.forEach(function(p){ html += boodschapItem(p); });
+    op.forEach(function(item){ html += boodschapItem(item.prod, item); });
   }
   if(bijna.length) {
     html += '<div class="cat-header"><div class="cat-lijn"></div><div class="cat-label" style="color:var(--c-warn)">Bijna op — ook meenemen</div><div class="cat-lijn"></div></div>';
-    bijna.forEach(function(p){ html += boodschapItem(p); });
+    bijna.forEach(function(item){ html += boodschapItem(item.prod, item); });
   }
-  html += '<div style="margin-top:14px"><button class="btn-primary" id="wis-boodschappen-btn">🗑 Verwijder afgevinkte</button></div>';
+  if(minimum.length) {
+    html += '<div class="cat-header"><div class="cat-lijn"></div><div class="cat-label" style="color:#7B61FF">Te weinig — onder minimum</div><div class="cat-lijn"></div></div>';
+    minimum.forEach(function(item){ html += boodschapItem(item.prod, item); });
+  }
+
+  var aantalGekocht = lijst.filter(function(item){ return boodschappenGekocht.indexOf(item.prod.id) !== -1; }).length;
+  if(aantalGekocht > 0) {
+    html += '<div style="margin-top:14px"><button class="btn-primary" id="wis-boodschappen-btn">✓ Gekocht — zet op Vol (' + aantalGekocht + ' producten)</button></div>';
+  }
   panel.innerHTML = html;
-  document.getElementById('wis-boodschappen-btn').onclick = wisBoodschappenLijst;
+  if(aantalGekocht > 0) document.getElementById('wis-boodschappen-btn').onclick = wisBoodschappenLijst;
 }
 
-function boodschapItem(p) {
+function boodschapItem(p, item) {
   var gk = boodschappenGekocht.indexOf(p.id) !== -1;
   var lk = {koelkast:'bl-koelkast',vriezer:'bl-vriezer',droog:'bl-droog'}[p.locatie]||'bl-droog';
+  var subTekst = p.aantal || '';
+  if(item && item.tekort) subTekst += (subTekst ? ' · ' : '') + 'nog ' + (getAantalNum(p)||0) + ', tekort: ' + item.tekort;
+  if(item && item.ontbreekt) subTekst = 'Niet in voorraad';
   return '<div class="boodschap-item ' + (gk?'gekocht':'') + '">' +
     '<div class="boodschap-check ' + (gk?'aan':'') + '" onclick="toggleGekocht(\'' + p.id + '\')">' + (gk?'✓':'') + '</div>' +
     '<div style="flex:1"><div class="boodschap-naam">' + (p.icon||'📦') + ' ' + p.naam + '</div>' +
-    '<div class="boodschap-sub">' + (p.aantal||'') + ' · ' + locNaam(p.locatie) + '</div></div>' +
+    (subTekst ? '<div class="boodschap-sub">' + subTekst + ' · ' + locNaam(p.locatie) + '</div>' : '<div class="boodschap-sub">' + locNaam(p.locatie) + '</div>') +
+    '</div>' +
     '<span class="boodschap-loc ' + lk + '">' + locNaam(p.locatie) + '</span>' +
   '</div>';
 }
@@ -1504,6 +1588,23 @@ function voerUpdateUit() {
   document.close();
 }
 
+function ververs() {
+  // Zet alle bijna/op producten die nog niet in boodschappenlijst staan er automatisch in
+  producten.forEach(function(p) {
+    if(p.status === 'op' || p.status === 'bijna') {
+      if(boodschappenGekocht.indexOf(p.id) !== -1) {
+        boodschappenGekocht = boodschappenGekocht.filter(function(id){ return id !== p.id; });
+      }
+    }
+  });
+  slaBoodschappen();
+  render();
+  // Laad ook nieuwste data van cloud
+  laadVanCloud();
+  // Toon korte bevestiging via sync balk
+  syncStatus('ok', 'Vernieuwd om ' + tijdNu());
+}
+
 // ============ HELPERS ============
 function sluitOverlay(id) { document.getElementById(id).classList.remove('open'); }
 function locIcon(loc) { return {koelkast:'🧊',vriezer:'❄️',droog:'🥫'}[loc]||'📦'; }
@@ -1517,6 +1618,10 @@ function formatDatum(datum) {
   var d=new Date(datum);
   return d.getDate()+'-'+(d.getMonth()+1)+'-'+d.getFullYear();
 }
+document.getElementById('inkoop-input').addEventListener('keydown', function(e){
+  if(e.key === 'Enter') bevestigInkoop();
+});
+
 document.querySelectorAll('.overlay').forEach(function(ov){
   ov.addEventListener('click',function(e){ if(e.target===ov) ov.classList.remove('open'); });
 });
